@@ -1,12 +1,16 @@
 'use client';
 import Link from 'next/link';
 import { useApp } from '../../components/Providers';
-import { COURSES, UI } from '../../lib/data';
+import { COURSES, UI, BADGES } from '../../lib/data';
 export default function Courses() {
   const { t, done } = useApp();
+  const every = COURSES.flatMap((c) => c.lessons);
+  const total = every.filter((l) => done[l.id]).length;
   return (
     <main className="wrap">
       <h1>{t(UI.courses)}</h1>
+      <p className="lead">{total} / {every.length} {t(UI.lessons)} ✓</p>
+      <div className="badges">{BADGES.map((b) => <span key={b.id} className={b.test(done) ? 'badge on' : 'badge'}>{b.icon} {t(b.t)}</span>)}</div>
       <div className="steps" style={{ marginTop: '2rem' }}>
         {COURSES.map((c) => {
           const n = c.lessons.filter((l) => done[l.id]).length;
