@@ -1,25 +1,37 @@
 'use client';
 import { useEffect, useState } from 'react';
-const CODE = 'function double(n) {\n  return n * 2;\n}';
-const TESTS = ['double(4) → 8', 'double(-3) → -6', 'double(0) → 0'];
+import { highlight } from '../lib/highlight';
+const S = [
+  { tab: 'JavaScript', file: 'groupBy.js', code: 'function groupBy(arr, fn) {\n  return arr.reduce((acc, x) => {\n    const k = fn(x);\n    (acc[k] ||= []).push(x);\n    return acc;\n  }, {});\n}', tests: ['groupBy([1,2,3,4], parity)', 'groupBy([], id) → {}', 'entrée non modifiée'] },
+  { tab: 'React', file: 'Counter.jsx', code: 'function Counter() {\n  const [n, setN] = useState(0);\n  return (\n    <button onClick={() => setN(n + 1)}>\n      {n}\n    </button>\n  );\n}', tests: ['affiche 0 au départ', 'le clic passe à 1', 'useState est utilisé'] },
+  { tab: 'Next.js', file: 'route.js', code: 'export async function GET(request) {\n  const q = new URL(request.url)\n    .searchParams.get("q");\n  return Response.json({ q });\n}', tests: ['?q=hi → { q: "hi" }', 'répond en JSON', 'route valide'] },
+];
 export default function Hero() {
+  const [s, setS] = useState(0);
   const [n, setN] = useState(0);
   const [ok, setOk] = useState(0);
+  const cur = S[s];
   useEffect(() => {
-    const id = setInterval(() => setN((x) => (x < CODE.length ? x + 1 : x)), 70);
-    return () => clearInterval(id);
-  }, []);
+    if (n >= cur.code.length) return;
+    const id = setTimeout(() => setN(n + 1), n === 0 ? 500 : 24);
+    return () => clearTimeout(id);
+  }, [n, s]);
   useEffect(() => {
-    if (n < CODE.length) return;
-    const id = setInterval(() => setOk((o) => (o < TESTS.length ? o + 1 : o)), 500);
-    const reset = setTimeout(() => { setN(0); setOk(0); }, 6000);
-    return () => { clearInterval(id); clearTimeout(reset); };
-  }, [n]);
+    if (n < cur.code.length) return;
+    const id = setTimeout(() => { if (ok < cur.tests.length) setOk(ok + 1); else { setS((s + 1) % S.length); setN(0); setOk(0); } }, ok < cur.tests.length ? 450 : 2800);
+    return () => clearTimeout(id);
+  }, [n, ok, s]);
+  const typed = cur.code.slice(0, n);
   return (
-    <div className="editor" aria-hidden="true">
-      <div className="bar"><i /><i /><i /><b>double.js</b></div>
-      <pre>{CODE.slice(0, n)}<span className="caret" /></pre>
-      <ul>{TESTS.map((x, i) => <li key={x} className={i < ok ? 'pass' : ''}>{i < ok ? '✓' : '○'} {x}</li>)}</ul>
+    <div className="term" aria-hidden="true">
+      <div className="tabs"><i /><i /><i />
+        {S.map((x, i) => <button key={x.tab} className={i === s ? 'on' : ''} onClick={() => { setS(i); setN(0); setOk(0); }}>{x.file}</button>)}
+      </div>
+      <div className="body">
+        <div className="ln">{typed.split('\n').map((_, i) => <div key={i}>{i + 1}</div>)}</div>
+        <pre><span dangerouslySetInnerHTML={{ __html: highlight(typed) }} /><span className="caret" /></pre>
+      </div>
+      <ul>{cur.tests.map((x, i) => <li key={x} className={n >= cur.code.length && i < ok ? 'pass' : ''}>{n >= cur.code.length && i < ok ? '✓' : '○'} {x}</li>)}</ul>
     </div>
   );
 }

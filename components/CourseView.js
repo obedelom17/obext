@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from './Providers';
 import { COURSES, UI, SOL, EXAMS, isReady } from '../lib/data';
+import Editor from './Editor';
 
 const strip = (c) => c.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
 const js = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
@@ -39,10 +40,24 @@ for(let i=0;i<T.length;i++){const t=T[i];try{if(t.match){out[i]=new RegExp(t.mat
     document.body.appendChild(f);
   });
 }
+function runHTML(code, lesson) {
+  return new Promise((resolve) => {
+    const id = Math.random().toString(36).slice(2);
+    const tests = lesson.tests.map(({ dom, expect, match }) => ({ dom, expect, match }));
+    const html = code + `<script>addEventListener('load',()=>{const T=${js(tests)};const out=T.map(t=>{try{if(t.match)return new RegExp(t.match,'i').test(${js(code)});return JSON.stringify(eval(t.dom))===JSON.stringify(t.expect)}catch(e){return false}});parent.postMessage({id:${js(id)},out},'*')})</script>`;
+    const f = document.createElement('iframe');
+    f.sandbox = 'allow-scripts'; f.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;height:600px;border:0'; f.srcdoc = html;
+    const fin = (out) => { window.removeEventListener('message', h); clearTimeout(to); f.remove(); resolve(out); };
+    const h = (e) => { if (e.data && e.data.id === id) fin(e.data.out); };
+    const to = setTimeout(() => fin(lesson.tests.map(() => false)), 6000);
+    window.addEventListener('message', h);
+    document.body.appendChild(f);
+  });
+}
 const Rich = ({ text }) => text.split('`').map((p, k) => (k % 2 ? <code key={k}>{p}</code> : p));
 
 export default function CourseView({ slug }) {
-  const { t, done, markDone, user, api } = useApp();
+  const { t, done, markDone, user, api, ready: loaded } = useApp();
   const course = COURSES.find((c) => c.slug === slug);
   const [i, setI] = useState(0);
   const [codes, setCodes] = useState({});
@@ -62,11 +77,12 @@ export default function CourseView({ slug }) {
   const passed = res && res.every(Boolean);
   const failed = tries[lesson.id] || 0;
   useEffect(() => { setRes(null); setShowSol(false); }, [i]);
+  useEffect(() => { if (!loaded) return; const k = course.lessons.findIndex((l) => !done[l.id]); setI(k < 0 ? 0 : k); }, [loaded]);
   useEffect(() => { try { setCodes(JSON.parse(localStorage.getItem('ox-code') || '{}')); } catch {} }, []);
   useEffect(() => { if (Object.keys(codes).length) try { localStorage.setItem('ox-code', JSON.stringify(codes)); } catch {} }, [codes]);
   async function run() {
     setBusy(true);
-    const r = lesson.react ? await runReact(code, lesson) : await runJS(code, lesson.tests);
+    const r = lesson.html ? await runHTML(code, lesson) : lesson.react ? await runReact(code, lesson) : await runJS(code, lesson.tests);
     setRes(r); setBusy(false);
     if (r.every(Boolean)) markDone(lesson.id);
     else setTries((x) => ({ ...x, [lesson.id]: (x[lesson.id] || 0) + 1 }));
@@ -93,9 +109,10 @@ export default function CourseView({ slug }) {
       <aside>
         <Link href="/courses/" className="back">← {t(UI.courses)}</Link>
         <h2>{t(course.title)}</h2>
+        <div className="prog"><i style={{ width: `${(course.lessons.filter((l) => done[l.id]).length / course.lessons.length) * 100}%` }} /></div>
         {course.lessons.map((l, k) => (
           <button key={l.id} className={!exam && k === i ? 'on' : ''} onClick={() => { setExam(false); setI(k); }}>
-            <span>{done[l.id] ? '✓' : k + 1}</span>{t(l.title)}
+            <span className={done[l.id] ? 'ok' : ''}>{done[l.id] ? '✓' : k + 1}</span>{t(l.title)}
           </button>
         ))}
         {exm && lessonsDone && <button className={exam ? 'on' : ''} onClick={() => setExam(true)}><span>{done['exam-' + slug] ? '✓' : '★'}</span>{t(UI.exam)}</button>}
@@ -117,7 +134,8 @@ export default function CourseView({ slug }) {
         <section key={lesson.id} className="pane">
           <h1>{t(lesson.title)}</h1>
           <p className="lead"><Rich text={t(lesson.body)} /></p>
-          <textarea spellCheck={false} value={code} onKeyDown={onKey} onChange={(e) => setCodes({ ...codes, [lesson.id]: e.target.value })} />
+          <Editor value={code} onKeyDown={onKey} onChange={(e) => setCodes({ ...codes, [lesson.id]: e.target.value })} />
+          {lesson.html && <iframe className="preview" title="preview" sandbox="allow-scripts" srcDoc={code} />}
           <div className="row">
             <button className="btn" onClick={run} disabled={busy}>{busy ? t(UI.checking) : t(UI.check)}</button>
             {passed && i < course.lessons.length - 1 && <button className="btn alt" onClick={() => setI(i + 1)}>{t(UI.next)} →</button>}

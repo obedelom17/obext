@@ -33,3 +33,10 @@ npm run pages:dev                # build + wrangler pages dev (site + API)
 ## Ajouter du contenu
 Cours > leçons > tests dans `lib/data.js`. Questions d'examen : `EXAMS` dans `lib/data.js` **et** réponses (index) dans `server/answers.js`.
 Nom du site : `SITE_NAME` dans `lib/data.js` et titre dans `app/layout.js`.
+
+## Vérifier que la base est bien connectée
+Après déploiement, ouvre `https://TON-SITE.pages.dev/api/health` :
+- `{"jwtSecret":true,"databaseUrl":true,"database":true,"tables":true}` : tout est bon ;
+- `databaseUrl:false` ou `jwtSecret:false` : la variable manque dans Cloudflare Pages (puis relance un déploiement) ;
+- `database:false` : la chaîne `DATABASE_URL` est fausse ou incomplète ;
+- `tables:false` : `neon.sql` n'a pas été exécuté dans la base.

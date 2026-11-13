@@ -17,7 +17,7 @@ export default function Verify() {
         <button className="btn">{t(UI.check)}</button>
       </form>
       {res === false && <p className="msg">✗ {t(UI.invalid)}</p>}
-      {res && <div className="step" style={{ '--c': course?.color }}><h3>✓ {t(UI.valid)}</h3><p><b>{res.name}</b> — {course ? t(course.title) : res.course}</p><small>{t(UI.issued)} {new Date(res.issued_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { dateStyle: 'long' })}</small></div>}
+      {res && <div className="card" style={{ '--c': course?.color }}><h3>✓ {t(UI.valid)}</h3><p><b>{res.name}</b> — {course ? t(course.title) : res.course}</p><small>{t(UI.issued)} {new Date(res.issued_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { dateStyle: 'long' })}</small></div>}
     </main>
   );
 }
