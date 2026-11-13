@@ -40,3 +40,8 @@ Après déploiement, ouvre `https://TON-SITE.pages.dev/api/health` :
 - `databaseUrl:false` ou `jwtSecret:false` : la variable manque dans Cloudflare Pages (puis relance un déploiement) ;
 - `database:false` : la chaîne `DATABASE_URL` est fausse ou incomplète ;
 - `tables:false` : `neon.sql` n'a pas été exécuté dans la base.
+
+## Design
+Direction éditoriale « suisse » : grille visible, très grosses lettres, un seul accent (`--signal`), curseur-caret personnalisé, bascule clair/sombre en révélation circulaire (View Transitions API), barre de progression de scroll en CSS pur. Les couleurs et la grille sont dans les variables en haut de `app/globals.css`.
+Polices (Google Fonts via `next/font`) : Archivo Black (titres), Schibsted Grotesk (texte), Martian Mono (code et étiquettes). Si ton Next.js refuse un nom de police au build, remplace-le dans `app/layout.js`.
+Logo : `components/Logo.js` (un « o » et un curseur de saisie) et `app/icon.svg`.

@@ -15,10 +15,10 @@ export default function Account() {
     if (r.ok) { location.href = '/courses/'; return; }
     setErr(t(r.status === 401 ? UI.errCreds : r.status === 409 ? UI.errExists : r.status === 400 ? UI.errInvalid : UI.syncErr));
   }
-  if (user) return <main className="wrap"><h1>{user.name}</h1><p className="lead">{user.email}</p><button className="btn" onClick={logout}>{t(UI.logout)}</button></main>;
+  if (user) return <main className="page"><h1>{user.name}</h1><p className="lead">{user.email}</p><button className="btn" onClick={logout}>{t(UI.logout)}</button></main>;
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
-    <main className="wrap">
+    <main className="page">
       <form className="auth" onSubmit={submit}>
         <h1>{t(mode === 'login' ? UI.login : UI.register)}</h1>
         {mode === 'register' && <input required placeholder={t(UI.fullName)} value={f.name} onChange={set('name')} />}

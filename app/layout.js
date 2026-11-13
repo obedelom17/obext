@@ -1,19 +1,19 @@
 import './globals.css';
-import { Instrument_Serif, Geist, Geist_Mono } from 'next/font/google';
+import { Archivo_Black, Schibsted_Grotesk, Martian_Mono } from 'next/font/google';
 import { Providers } from '../components/Providers';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Fx from '../components/Fx';
-const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], variable: '--serif' });
-const sans = Geist({ subsets: ['latin'], variable: '--sans' });
-const mono = Geist_Mono({ subsets: ['latin'], variable: '--mono' });
+const display = Archivo_Black({ subsets: ['latin'], weight: '400', variable: '--display' });
+const sans = Schibsted_Grotesk({ subsets: ['latin'], variable: '--sans' });
+const mono = Martian_Mono({ subsets: ['latin'], variable: '--mono' });
 export const metadata = { title: 'obext.js — HTML, CSS, JavaScript, React, Next.js', description: 'Apprends à coder par la pratique : exercices corrigés dans le navigateur, certificats vérifiables. FR / EN.' };
-const init = "try{var t=localStorage.getItem('ox-theme');document.documentElement.dataset.theme=t==='light'?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}document.documentElement.classList.add('js')";
+const init = "try{var t=localStorage.getItem('ox-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}document.documentElement.classList.add('js')";
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" data-theme="dark" suppressHydrationWarning>
+    <html lang="fr" data-theme="light" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: init }} /></head>
-      <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+      <body className={`${display.variable} ${sans.variable} ${mono.variable}`}>
         <Providers><Fx /><Header />{children}<Footer /></Providers>
       </body>
     </html>

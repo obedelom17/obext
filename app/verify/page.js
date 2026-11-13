@@ -10,7 +10,7 @@ export default function Verify() {
   useEffect(() => { const v = new URLSearchParams(location.search).get('id'); if (v) { setId(v); check(v); } }, []);
   const course = res && COURSES.find((c) => c.slug === res.course);
   return (
-    <main className="wrap">
+    <main className="page">
       <h1>{t(UI.verifyTitle)}</h1>
       <form className="row" onSubmit={(e) => { e.preventDefault(); check(id.trim()); }}>
         <input placeholder="OX-XXXXXXXXXX" value={id} onChange={(e) => setId(e.target.value)} />

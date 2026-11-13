@@ -105,7 +105,7 @@ export default function CourseView({ slug }) {
   }
   const cert = `/certificate/?c=${slug}`;
   return (
-    <main className="wrap lesson" style={{ '--c': course.color }}>
+    <main className="page lesson" style={{ '--c': course.color }}>
       <aside>
         <Link href="/courses/" className="back">← {t(UI.courses)}</Link>
         <h2>{t(course.title)}</h2>
@@ -132,6 +132,7 @@ export default function CourseView({ slug }) {
         </section>
       ) : (
         <section key={lesson.id} className="pane">
+          <div className="kick">{t(UI.lesson)} {String(i + 1).padStart(2, '0')} / {String(course.lessons.length).padStart(2, '0')}</div>
           <h1>{t(lesson.title)}</h1>
           <p className="lead"><Rich text={t(lesson.body)} /></p>
           <Editor value={code} onKeyDown={onKey} onChange={(e) => setCodes({ ...codes, [lesson.id]: e.target.value })} />
