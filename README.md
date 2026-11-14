@@ -31,7 +31,7 @@ npm run pages:dev                # build + wrangler pages dev (site + API)
 - Pas de limitation de débit ni de réinitialisation de mot de passe par e-mail.
 
 ## Ajouter du contenu
-Cours > leçons > tests dans `lib/data.js`. Questions d'examen : `EXAMS` dans `lib/data.js` **et** réponses (index) dans `server/answers.js`.
+Cours > leçons > tests dans `lib/data.js`. Le contenu pédagogique de chaque leçon (explication, exemple, étapes, piège) est dans `lib/guide/*.js` (un fichier par cours, une entrée par `id` de leçon, FR + EN) ; la présentation de chaque cours est dans `INTRO` de `lib/guide.js`. Les textes de l'interface ajoutés au redesign sont dans `lib/ux.js`. Questions d'examen : `EXAMS` dans `lib/data.js` **et** réponses (index) dans `server/answers.js`.
 Nom du site : `SITE_NAME` dans `lib/data.js` et titre dans `app/layout.js`.
 
 ## Vérifier que la base est bien connectée
