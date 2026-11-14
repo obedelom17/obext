@@ -7,6 +7,7 @@ import CountUp from '../components/CountUp';
 import { useApp } from '../components/Providers';
 import { COURSES, UI } from '../lib/data';
 import { X } from '../lib/ux';
+import { SOURCES } from '../lib/guide/links';
 
 const WORDS = ['HTML', 'CSS', 'JavaScript', 'React', 'Next.js', 'Algorithmes', 'Hooks', 'Flexbox', 'Server Actions', 'Async'];
 
@@ -71,6 +72,24 @@ export default function Home() {
         <div className="sec-h"><span className="lbl rv">{t(UI.pathLbl).replace(/^\[\d+\]\s*/, '')}</span><h2 className="rv">{t({ fr: `${COURSES.length} cours. Une seule méthode.`, en: `${COURSES.length} courses. One method.` })}</h2></div>
         <div className="rows">{COURSES.map((c, i) => <CourseRow key={c.slug} c={c} i={i} />)}</div>
       </section>
+      <section className="sec based-sec">
+        <div className="sec-h"><span className="lbl rv">{t({ fr: 'Sources', en: 'Sources' })}</span><h2 className="rv">{t(X.basedOn)}</h2></div>
+        <p className="lead rv">{t(X.basedText)}</p>
+        <div className="based">
+          {[
+            ['HTML / CSS', 'MDN Web Docs', SOURCES['html-css'].url, X.basedHtml, X.basedCss],
+            ['JavaScript', 'MDN Web Docs', SOURCES.javascript.url, X.basedJs],
+            ['React', 'react.dev', SOURCES.react.url, X.basedReact],
+            ['Next.js', 'nextjs.org/docs', SOURCES.nextjs.url, X.basedNext],
+          ].map(([n, src, url, d1, d2], i) => (
+            <a key={n} href={url} target="_blank" rel="noopener noreferrer" className="rv" style={{ '--d': `${i * 0.07}s` }}>
+              <h3>{n}</h3><span className="lbl">{src}</span>
+              <p>{t(d1)}{d2 ? ` · ${t(d2)}` : ''}</p>
+              <span className="go">{t(X.openDoc)} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg></span>
+            </a>
+          ))}
+        </div>
+      </section>
       <section className="sec method">
         <div className="sec-h"><span className="lbl rv">{t(UI.methodLbl).replace(/^\[\d+\]\s*/, '')}</span><h2 className="rv">{t(UI.methodTitle)}</h2></div>
         <div className="cards">
@@ -93,7 +112,10 @@ export default function Home() {
       </section>
       <section className="cta">
         <div className="big rv">{t(UI.ctaBig)}</div>
-        <Link className="btn inv mag" href="/courses/">{t(UI.start)}<span className="ar"><Arrow /></span></Link>
+        <div className="row">
+          <Link className="btn inv mag" href="/courses/">{t(UI.start)}<span className="ar"><Arrow /></span></Link>
+          <Link className="btn ghost-dark mag" href="/certificate/exemple/">{t(X.seeSample)}</Link>
+        </div>
       </section>
     </main>
   );

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useApp } from '../../components/Providers';
 import { COURSES, UI, SITE_NAME, isReady } from '../../lib/data';
 import { X } from '../../lib/ux';
+import CertCard from '../../components/CertCard';
 export default function Certificate() {
   const { t, lang, done, user, ready, api } = useApp();
   const [slug, setSlug] = useState(null);
@@ -25,16 +26,7 @@ export default function Certificate() {
   return (
     <main className="page">
       <div className="noprint row"><button className="btn" onClick={() => window.print()}>{t(UI.print)}</button></div>
-      <div className="cert" style={{ '--c': course.color }}>
-        <div className="seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="cp" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0" /></defs><text><textPath href="#cp">{`${SITE_NAME} · ${SITE_NAME} · ${SITE_NAME} · ${SITE_NAME} · `}</textPath></text><circle cx="60" cy="60" r="28" /><path d="m47 61 9 9 18-20" /></svg></div>
-        <small>{t(X.signedBy)} {SITE_NAME}</small>
-        <h1>{t(UI.certOf)}</h1>
-        <h2>{cert.name}</h2>
-        <p>{t(UI.certText)}</p>
-        <h3>{t(course.title)}</h3>
-        <footer><span>{new Date(cert.issued_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { dateStyle: 'long' })}</span><span>ID {cert.id}</span></footer>
-        <small>{t(UI.verifyUrl)} : {url}</small>
-      </div>
+      <CertCard t={t} lang={lang} color={course.color} name={cert.name} courseTitle={t(course.title)} date={new Date(cert.issued_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { dateStyle: 'long' })} id={cert.id} url={url} />
     </main>
   );
 }

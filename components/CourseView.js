@@ -7,6 +7,7 @@ import Editor from './Editor';
 import Ring from './Ring';
 import { X } from '../lib/ux';
 import { GUIDE, INTRO } from '../lib/guide';
+import { SOURCES } from '../lib/guide/links';
 import { highlight } from '../lib/highlight';
 
 const strip = (c) => c.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
@@ -29,7 +30,7 @@ function runReact(code, lesson) {
     const src = code.replace(/^\s*import[^\n]*$/gm, '').replace(/export\s+default\s+/, '');
     const tests = lesson.tests.map(({ dom, expect, pre, match }) => ({ dom, expect, pre, match }));
     const html = `<div id="r"></div><script src="${CDN}react/18.3.1/umd/react.production.min.js"></script><script src="${CDN}react-dom/18.3.1/umd/react-dom.production.min.js"></script><script src="${CDN}babel-standalone/7.24.7/babel.min.js"></script><script>
-const {useState,useEffect,useRef,useReducer,useMemo,useCallback,createContext,useContext}=React;const Link=({href,children,...r})=>React.createElement('a',{href,...r},children);const Image=(p)=>React.createElement('img',{src:p.src,alt:p.alt});const usePathname=()=>'/courses';const useRouter=()=>({push(){}});const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const {useState,useEffect,useRef,useReducer,useMemo,useCallback,createContext,useContext,useId,memo,Fragment,useLayoutEffect}=React;const Link=({href,children,...r})=>React.createElement('a',{href,...r},children);const Image=(p)=>React.createElement('img',{src:p.src,alt:p.alt});const usePathname=()=>'/courses';const useRouter=()=>({push(){}});const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{const T=${js(tests)},out=T.map(()=>false);try{
 const C=(0,eval)(Babel.transform(${js(src)}+'\\n;${lesson.component}',{presets:['react']}).code);
 ReactDOM.createRoot(document.getElementById('r')).render(React.createElement(C,${js(lesson.props || {})}));await sleep(80);
@@ -135,6 +136,26 @@ export default function CourseView({ slug }) {
     setEr(r.data);
     if (r.data.passed) { markDone('exam-' + slug); dispatchEvent(new CustomEvent('ox:burst', { detail: { x: innerWidth / 2, y: innerHeight * 0.6, power: 2 } })); }
   }
+  if (!loaded) return <main className="page" aria-busy="true" />;
+  if (!user) {
+    const it = INTRO[slug];
+    return (
+      <main className="page gate" style={{ '--c': course.color }}>
+        <Link href="/courses/" className="back">← {t(UI.courses)}</Link>
+        <div className="gate-box">
+          <i className="tile" aria-hidden="true">{course.icon}</i>
+          <h1>{t(course.title)}</h1>
+          <p className="lead">{t(course.desc)}</p>
+          {it && <ul className="gate-list">{t(it.learn).map((x) => <li key={x}>{x}</li>)}</ul>}
+          <div className="gate-cta">
+            <h2>{t(X.gateTitle)}</h2>
+            <p>{t(X.gateText)}</p>
+            <div className="row"><Link className="btn" href="/account/">{t(X.createAcc)}</Link><Link className="btn ghost" href="/certificate/exemple/">{t(X.seeSample)}</Link></div>
+          </div>
+        </div>
+      </main>
+    );
+  }
   const cert = `/certificate/?c=${slug}`;
   const nDone = course.lessons.filter((l) => done[l.id]).length;
   const file = lesson.html ? 'index.html' : lesson.react ? 'App.jsx' : 'solution.js';
@@ -176,7 +197,7 @@ export default function CourseView({ slug }) {
           {i === 0 && INTRO[slug] && (
             <section className="intro">
               <div><span className="lbl">{t(X.goalH)}</span><p>{t(INTRO[slug].goal)}</p></div>
-              <div className="meta"><span><b>{t(X.timeH)}</b> {t(INTRO[slug].time)}</span><span><b>{t(X.needH)}</b> {t(INTRO[slug].need)}</span></div>
+              <div className="meta"><span><b>{t(X.timeH)}</b> {t(INTRO[slug].time)}</span><span><b>{t(X.needH)}</b> {t(INTRO[slug].need)}</span>{SOURCES[slug] && <span><b>{t(X.docH)}</b> <a className="u" href={SOURCES[slug].url} target="_blank" rel="noopener noreferrer">{SOURCES[slug].name}</a></span>}</div>
               <div><span className="lbl">{t(X.willLearn)}</span><ul>{t(INTRO[slug].learn).map((x) => <li key={x}>{x}</li>)}</ul></div>
             </section>
           )}
@@ -185,6 +206,7 @@ export default function CourseView({ slug }) {
               <h2 className="gh"><i>1</i>{t(X.learnH)}</h2>
               <p className="gp"><Rich text={t(G.learn)} /></p>
               <Example code={G.ex} t={t} />
+              {G.doc && <a className="doclink" href={G.doc} target="_blank" rel="noopener noreferrer"><span>{t(X.docH)}</span><b>{(SOURCES[slug] || {}).name}</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg></a>}
               <h2 className="gh"><i>2</i>{t(X.stepsH)}</h2>
               <ol className="gsteps">{t(G.steps).map((x, k) => <li key={k}><Rich text={x} /></li>)}</ol>
               <p className="tipbox"><b>{t(X.tipH)}</b> <Rich text={t(G.tip)} /></p>

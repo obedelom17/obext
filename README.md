@@ -30,8 +30,11 @@ npm run pages:dev                # build + wrangler pages dev (site + API)
 - Les leçons sont validées par le navigateur : un utilisateur technique peut déclarer une leçon réussie sans l'avoir faite. Seul l'examen est contrôlé par le serveur.
 - Pas de limitation de débit ni de réinitialisation de mot de passe par e-mail.
 
+## Accès aux leçons
+Les leçons sont réservées aux comptes (écran de connexion dans `components/CourseView.js`). Attention : le site est un export statique, ce verrouillage est un verrou d'interface ; le contenu pédagogique reste dans le code envoyé au navigateur. Un exemple public de certificat est sur `/certificate/exemple/`.
+
 ## Ajouter du contenu
-Cours > leçons > tests dans `lib/data.js`. Le contenu pédagogique de chaque leçon (explication, exemple, étapes, piège) est dans `lib/guide/*.js` (un fichier par cours, une entrée par `id` de leçon, FR + EN) ; la présentation de chaque cours est dans `INTRO` de `lib/guide.js`. Les textes de l'interface ajoutés au redesign sont dans `lib/ux.js`. Questions d'examen : `EXAMS` dans `lib/data.js` **et** réponses (index) dans `server/answers.js`.
+Cours > leçons > tests dans `lib/data.js`. Le contenu pédagogique de chaque leçon (explication, exemple, étapes, piège) est dans `lib/guide/*.js` (un fichier par cours, une entrée par `id` de leçon, FR + EN) ; la présentation de chaque cours est dans `INTRO` de `lib/guide.js`. Les leçons ajoutées d'après les documentations officielles sont dans `lib/lessons-docs.js` (exercices et solutions) et `lib/guide/docs.js` (explications) ; les liens vers les pages officielles sont dans `lib/guide/links.js`. Les textes de l'interface ajoutés au redesign sont dans `lib/ux.js`. Questions d'examen : `EXAMS` dans `lib/data.js` **et** réponses (index) dans `server/answers.js`.
 Nom du site : `SITE_NAME` dans `lib/data.js` et titre dans `app/layout.js`.
 
 ## Vérifier que la base est bien connectée
