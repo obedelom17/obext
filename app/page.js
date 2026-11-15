@@ -79,6 +79,7 @@ export default function Home() {
           {[
             ['HTML / CSS', 'MDN Web Docs', SOURCES['html-css'].url, X.basedHtml, X.basedCss],
             ['JavaScript', 'MDN Web Docs', SOURCES.javascript.url, X.basedJs],
+            ['Node.js', 'nodejs.org/docs', SOURCES.nodejs.url, X.basedNode],
             ['React', 'react.dev', SOURCES.react.url, X.basedReact],
             ['Next.js', 'nextjs.org/docs', SOURCES.nextjs.url, X.basedNext],
           ].map(([n, src, url, d1, d2], i) => (

@@ -13,7 +13,7 @@ export const metadata = {
   title: { default: 'obext.js — HTML, CSS, JavaScript, React, Next.js', template: '%s · obext.js' },
   description: 'Apprends à coder par la pratique : chaque leçon explique, montre un exemple, puis corrige ton code dans le navigateur. Certificats vérifiables. FR / EN.',
   applicationName: 'obext.js',
-  keywords: ['apprendre à coder', 'JavaScript', 'React', 'Next.js', 'HTML', 'CSS', 'learn to code'],
+  keywords: ['apprendre à coder', 'JavaScript', 'Node.js', 'React', 'Next.js', 'HTML', 'CSS', 'learn to code'],
   openGraph: { title: 'obext.js — apprends à coder par la pratique', description: 'HTML, CSS, JavaScript, React et Next.js : exercices corrigés dans le navigateur, certificats vérifiables.', type: 'website', locale: 'fr_FR', alternateLocale: ['en_US'] },
   twitter: { card: 'summary', title: 'obext.js', description: 'Apprends à coder par la pratique. Learn to code by doing.' },
 };

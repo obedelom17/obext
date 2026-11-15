@@ -334,10 +334,12 @@ kbd{font:500 .68rem var(--mono);border:1px solid var(--hair);border-bottom-width
 .gate-list li{position:relative;padding-left:1.3rem}.gate-list li::before{content:"";position:absolute;left:0;top:.55em;width:.65rem;height:.65rem;background:var(--c)}
 .gate-cta{border-top:1px solid var(--hair);padding-top:1.2rem;width:100%}.gate-cta h2{font-size:1.5rem;margin-bottom:.4rem}.gate-cta p{color:var(--mut)}
 .cert.sample{pointer-events:none}.stamp{position:absolute;left:2rem;top:2rem;border:3px solid var(--signal);color:var(--signal);font:400 1.6rem var(--display);padding:.1rem .8rem;transform:rotate(-8deg);letter-spacing:.04em}
-.based{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line);margin-top:2rem}
+.based{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--line);margin-top:2rem}
 .based a{display:grid;gap:.5rem;padding:1.4rem 1.4rem 1.6rem 0;border-right:1px solid var(--line);transition:background .3s,padding .3s var(--ease)}.based a+a{padding-left:1.4rem}.based a:last-child{border-right:0}
 .based a:hover{background:var(--ink);color:var(--paper);padding-left:1.8rem}.based h3{font-size:1.5rem}.based p{font-size:.92rem;color:var(--mut)}.based a:hover p{color:inherit}.based .go{justify-self:start;font:700 .85rem var(--sans);display:inline-flex;gap:.4rem;align-items:center}
 .sample-link{margin-top:1.5rem}
 @media(max-width:900px){.based{grid-template-columns:1fr 1fr}.based a{border-bottom:1px solid var(--line);padding:1.2rem 1rem}.based a+a{padding-left:1rem}}
 .btn.ghost-dark{background:transparent;color:#0A0A0B;border-color:#0A0A0B}.btn.ghost-dark::before{background:#0A0A0B}.btn.ghost-dark:hover{color:#ECEEF0}
 .u{text-decoration:underline;text-underline-offset:3px}.u:hover{color:var(--signal)}
+@media(max-width:1100px){.based{grid-template-columns:repeat(3,1fr)}.based a{border-bottom:1px solid var(--line)}}
+.nodenote{max-width:68ch;border:1px dashed var(--ink);padding:.7rem 1rem;font-size:.9rem;color:var(--mut);background:var(--paper2)}

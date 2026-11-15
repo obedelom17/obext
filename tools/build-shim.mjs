@@ -1,0 +1,5 @@
+import fs from 'node:fs';
+const src = fs.readFileSync(new URL('./node-shim.src.js', import.meta.url), 'utf8');
+const out = `// Fichier généré par tools/build-shim.mjs : ne pas modifier à la main.\nexport const NODE_SHIM = ${JSON.stringify(src + '\nshim();')};\n\n// Convertit les import/export ES en équivalents exécutables dans le Worker.\nexport function nodePrepare(code) {\n  return code\n    .replace(/^\\s*import\\s+\\*\\s+as\\s+(\\w+)\\s+from\\s+['"]([^'"]+)['"]\\s*;?/gm, 'const $1 = require("$2");')\n    .replace(/^\\s*import\\s+\\{([^}]*)\\}\\s+from\\s+['"]([^'"]+)['"]\\s*;?/gm, (m, a, b) => 'const {' + a.replace(/\\s+as\\s+/g, ': ') + '} = require("' + b + '");')\n    .replace(/^\\s*import\\s+(\\w+)\\s+from\\s+['"]([^'"]+)['"]\\s*;?/gm, 'const $1 = require("$2");')\n    .replace(/^\\s*export\\s*\\{[^}]*\\}\\s*;?\\s*$/gm, '')\n    .replace(/^\\s*export\\s+(default\\s+)?/gm, '');\n}\n`;
+fs.writeFileSync(new URL('../lib/node-shim.js', import.meta.url), out);
+console.log('lib/node-shim.js', out.length, 'octets');

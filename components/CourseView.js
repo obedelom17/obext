@@ -8,19 +8,24 @@ import Ring from './Ring';
 import { X } from '../lib/ux';
 import { GUIDE, INTRO } from '../lib/guide';
 import { SOURCES } from '../lib/guide/links';
+import { NODE_SHIM, nodePrepare } from '../lib/node-shim';
 import { highlight } from '../lib/highlight';
 
 const strip = (c) => c.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
 const js = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
 const CDN = 'https://cdnjs.cloudflare.com/ajax/libs/';
 
-function runJS(code, tests) {
+const WORKER_SRC = 'onmessage=async e=>{const {code,clean,tests,pre}=e.data;const out=[];const canon=v=>JSON.stringify(v,(k,x)=>x&&typeof x==="object"&&!Array.isArray(x)?Object.keys(x).sort().reduce((o,k)=>(o[k]=x[k],o),{}):x);for(const t of tests){try{if(t.match){out.push(new RegExp(t.match).test(clean));continue}const r=await (0,eval)(pre+code.replace(/^\\s*export\\s+(default\\s+)?/gm,"")+"\\n;("+t.expr+")");out.push(canon(r)===canon(t.expect))}catch(err){out.push(false)}}postMessage(out)}';
+
+// Les tests tournent l’un après l’autre (les leçons Node partagent un système de fichiers simulé).
+function runJS(code, tests, lesson = {}) {
   return new Promise((resolve) => {
-    const src = `onmessage=async e=>{const {code,clean,tests}=e.data;postMessage(await Promise.all(tests.map(async t=>{try{if(t.match)return new RegExp(t.match).test(clean);const r=await (0,eval)(code.replace(/^\\s*export\\s+(default\\s+)?/gm,'')+'\\n;('+t.expr+')');return JSON.stringify(r)===JSON.stringify(t.expect)}catch(err){return false}})))}`;
-    const w = new Worker(URL.createObjectURL(new Blob([src])));
-    const stop = setTimeout(() => { w.terminate(); resolve(tests.map(() => false)); }, 2500);
+    const node = !!lesson.node;
+    const pre = node ? `globalThis.__VFS=${js(lesson.vfs || {})};\n${NODE_SHIM}\n` : '';
+    const w = new Worker(URL.createObjectURL(new Blob([WORKER_SRC])));
+    const stop = setTimeout(() => { w.terminate(); resolve(tests.map(() => false)); }, 5000);
     w.onmessage = (e) => { clearTimeout(stop); w.terminate(); resolve(e.data); };
-    w.postMessage({ code, clean: strip(code), tests: tests.map(({ expr, expect, match }) => ({ expr, expect, match })) });
+    w.postMessage({ code: node ? nodePrepare(code) : code, clean: strip(code), pre, tests: tests.map(({ expr, expect, match }) => ({ expr, expect, match })) });
   });
 }
 
@@ -59,8 +64,15 @@ function runHTML(code, lesson) {
     document.body.appendChild(f);
   });
 }
-const Bold = ({ text }) => text.split('**').map((p, k) => (k % 2 ? <strong key={k}>{p}</strong> : p));
-const Rich = ({ text }) => text.split('`').map((p, k) => (k % 2 ? <code key={k}>{p}</code> : <Bold key={k} text={p} />));
+// Gras (**…**) et code (`…`) peuvent s’imbriquer : on lit le texte d’un seul trait.
+const Rich = ({ text }) => {
+  let bold = false;
+  return text.split(/(`[^`]*`|\*\*)/).filter(Boolean).map((p, k) => {
+    if (p === '**') { bold = !bold; return null; }
+    const node = p.length > 1 && p[0] === '`' && p.endsWith('`') ? <code key={k}>{p.slice(1, -1)}</code> : p;
+    return bold ? <strong key={k}>{node}</strong> : node;
+  });
+};
 
 function Example({ code, t }) {
   const [ok, setOk] = useState(false);
@@ -111,7 +123,7 @@ export default function CourseView({ slug }) {
   useEffect(() => { if (Object.keys(codes).length) try { localStorage.setItem('ox-code', JSON.stringify(codes)); } catch {} }, [codes]);
   async function run() {
     setBusy(true);
-    const r = lesson.html ? await runHTML(code, lesson) : lesson.react ? await runReact(code, lesson) : await runJS(code, lesson.tests);
+    const r = lesson.html ? await runHTML(code, lesson) : lesson.react ? await runReact(code, lesson) : await runJS(code, lesson.tests, lesson);
     setRes(r); setBusy(false);
     if (r.every(Boolean)) {
       markDone(lesson.id);
@@ -158,7 +170,7 @@ export default function CourseView({ slug }) {
   }
   const cert = `/certificate/?c=${slug}`;
   const nDone = course.lessons.filter((l) => done[l.id]).length;
-  const file = lesson.html ? 'index.html' : lesson.react ? 'App.jsx' : 'solution.js';
+  const file = lesson.html ? 'index.html' : lesson.react ? 'App.jsx' : lesson.node ? 'index.js' : 'solution.js';
   const nPass = res ? res.filter(Boolean).length : 0;
   const answered = exm ? Object.keys(ans).length : 0;
   return (
@@ -213,6 +225,7 @@ export default function CourseView({ slug }) {
               <h2 className="gh"><i>3</i>{t(X.yourTurn)}</h2>
             </section>
           )}
+          {lesson.node && <p className="nodenote">{t(X.nodeNote)}</p>}
           <p className="task"><span className="lbl">{t(X.taskH)}</span><Rich text={t(lesson.body)} /></p>
           <div className={`ed-wrap${passed ? ' won' : ''}`}>
             <div className="ed-bar"><span className="file">{file}</span><button className="linkish" onClick={() => setCodes({ ...codes, [lesson.id]: lesson.starter })}>{t(X.reset)}</button></div>
