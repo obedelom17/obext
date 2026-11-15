@@ -10,7 +10,7 @@ construire, déployer et maintenir une application ».
 3. Statuts : **✔✔** vérifié sur la documentation · **✔** présent mais écrit de mémoire (à vérifier) · **◐** partiel · **✗** manquant.
 4. Aucune leçon n’est supprimée : elles sont vérifiées, corrigées ou remplacées une par une.
 
-> Point de départ honnête : à ce jour, une seule page a été relue en détail (Next.js « proxy.js », 2026-09). Tout le reste est ✔ (de mémoire) ou ◐/✗.
+> Pages relues en détail à ce jour : Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » et « Handling conflicts » (2026-11-15). Tout le reste est ✔ (de mémoire) ou ◐/✗.
 > Exemple d’écart déjà trouvé : `middleware.js` est devenu `proxy.js` dans Next.js 16 (leçon ex-4 corrigée).
 
 ---
@@ -34,7 +34,7 @@ construire, déployer et maintenir une application ».
 | Thème | Statut | Leçons |
 |---|---|---|
 | Syntaxe, sélecteurs (type, classe, id, attribut, combinateurs) | ◐ | hc-4, hc-5 |
-| Cascade, spécificité, héritage | ✗ | — |
+| Cascade, spécificité (calcul 0-0-0), héritage, `inherit`/`initial`/`unset`, `all`, `!important` | ✔✔ (MDN « Handling conflicts », relue 2026-11-15) | casc-1…casc-7 |
 | Modèle de boîte, `box-sizing`, débordement (`overflow`) | ◐ | hc-6 |
 | Valeurs et unités, `calc()`, couleurs | ◐ | hc-22 |
 | Arrière-plans et bordures | ✗ | — |
@@ -55,9 +55,11 @@ construire, déployer et maintenir une application ».
 | Méthodes de tableau (`map`, `filter`, `reduce`, `every`…) | ✔ | js-2, js-3, js-5, js-17 |
 | Closures, classes, modules ES | ◐ | js-7, js-19 |
 | Erreurs (`try/catch`) | ✔ | jb-14 |
-| **Le DOM** : sélectionner, modifier, créer des éléments | ✗ | — |
-| **Événements** du navigateur (`addEventListener`, délégation) | ✗ | — |
-| Asynchrone : callbacks, promesses, `async/await`, `fetch` | ◐ | js-8, js-12 |
+| **Le DOM** : sélectionner, modifier, créer, déplacer, supprimer, styles et classes | ✔✔ (MDN « DOM scripting introduction », relue 2026-11-15) | dom-1…dom-6 |
+| **Événements** : `addEventListener`, objet événement, `preventDefault`, `removeEventListener`, écouteurs multiples | ✔✔ (MDN « Introduction to events », relue 2026-11-15) | ev-1…ev-5 |
+| Propagation : *bubbling*, `stopPropagation`, capture, délégation, `target` / `currentTarget` | ✔✔ (MDN « Event bubbling », relue 2026-11-15) | ev-6…ev-9 |
+| Requêtes réseau : `fetch`, `response.ok`, `text()`, `json()`, erreurs HTTP, `catch` | ✔✔ (MDN « Making network requests with JavaScript », relue 2026-11-15) | net-1…net-4 |
+| Asynchrone : callbacks, promesses, `async/await` | ◐ | js-8, js-12 |
 | API web : stockage (`localStorage`), vidéo/audio, canvas | ✗ | — |
 | Orienté objet avancé (prototypes) | ✗ | — |
 | Outils : npm, Git, déploiement | ◐ | nd-5 |

@@ -50,11 +50,14 @@ for(let i=0;i<T.length;i++){const t=T[i];try{if(t.match){out[i]=new RegExp(t.mat
     document.body.appendChild(f);
   });
 }
+// Serveur simulé pour les leçons fetch : le navigateur n’a pas de vrai serveur ici, mais fetch() renvoie de vraies Response.
+const FETCH_MOCK = `<script>(function(){const F={'verse1.txt':'Premier couplet : la mer est calme.','verse2.txt':'Deuxième couplet : le vent se lève.','products.json':JSON.stringify([{name:'Haricots',price:1.5},{name:'Maïs',price:1.2}])};window.fetch=async(url)=>{await new Promise((r)=>setTimeout(r,5));const k=String(url).replace(/^\\.?\\//,'');if(Object.prototype.hasOwnProperty.call(F,k))return new Response(F[k],{status:200,headers:{'Content-Type':k.endsWith('.json')?'application/json':'text/plain'}});return new Response('Not found',{status:404,statusText:'Not Found'})}})()</script>`;
+const prep = (code, lesson) => (lesson.mockFetch ? FETCH_MOCK + code : code);
 function runHTML(code, lesson) {
   return new Promise((resolve) => {
     const id = Math.random().toString(36).slice(2);
-    const tests = lesson.tests.map(({ dom, expect, match }) => ({ dom, expect, match }));
-    const html = code + `<script>addEventListener('load',()=>{const T=${js(tests)};const out=T.map(t=>{try{if(t.match)return new RegExp(t.match,'i').test(${js(code)});return JSON.stringify(eval(t.dom))===JSON.stringify(t.expect)}catch(e){return false}});parent.postMessage({id:${js(id)},out},'*')})</script>`;
+    const tests = lesson.tests.map(({ dom, expect, match, pre }) => ({ dom, expect, match, pre }));
+    const html = prep(code, lesson) + `<script>addEventListener('load',async()=>{const T=${js(tests)};const sl=(ms)=>new Promise((r)=>setTimeout(r,ms));const out=[];for(const t of T){let ok=false;try{if(t.match){ok=new RegExp(t.match,'i').test(${js(code)})}else{if(t.pre){for(const p of [].concat(t.pre)){eval(p);await sl(40)}}ok=JSON.stringify(eval(t.dom))===JSON.stringify(t.expect)}}catch(e){ok=false}out.push(ok)}parent.postMessage({id:${js(id)},out},'*')})</script>`;
     const f = document.createElement('iframe');
     f.sandbox = 'allow-scripts'; f.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;height:600px;border:0'; f.srcdoc = html;
     const fin = (out) => { window.removeEventListener('message', h); clearTimeout(to); f.remove(); resolve(out); };
@@ -231,7 +234,7 @@ export default function CourseView({ slug }) {
             <div className="ed-bar"><span className="file">{file}</span><button className="linkish" onClick={() => setCodes({ ...codes, [lesson.id]: lesson.starter })}>{t(X.reset)}</button></div>
             <Editor value={code} onKeyDown={onKey} onChange={(e) => setCodes({ ...codes, [lesson.id]: e.target.value })} />
           </div>
-          {lesson.html && <div className="pv"><span className="lbl">{t(X.preview)}</span><iframe className="preview" title="preview" sandbox="allow-scripts" srcDoc={code} /></div>}
+          {lesson.html && <div className="pv"><span className="lbl">{t(X.preview)}</span><iframe className="preview" title="preview" sandbox="allow-scripts" srcDoc={prep(code, lesson)} /></div>}
           <div className="row">
             <button ref={checkRef} className={`btn${busy ? ' busy' : ''}`} onClick={run} disabled={busy}>{busy ? t(UI.checking) : t(UI.check)}</button>
             <span className="kh">{t(X.runHint)}</span>

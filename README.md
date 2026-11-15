@@ -36,6 +36,9 @@ Les leçons sont réservées aux comptes (écran de connexion dans `components/C
 ## Cours Node.js
 Le cours Node.js (`lib/node-course.js`, explications dans `lib/guide/node.js`) s'exécute dans un Node simulé (`tools/node-shim.src.js`) : fichiers en mémoire, requêtes HTTP de test, aucun réseau réel. Après toute modification de `tools/node-shim.src.js`, relancer `node tools/build-shim.mjs` pour régénérer `lib/node-shim.js`.
 
+## Leçons navigateur (DOM, événements, fetch)
+Elles sont dans `lib/lessons-browser.js` (exercices et solutions) et `lib/guide/browser.js` (explications). Les leçons `net-*` utilisent un **serveur simulé** : `FETCH_MOCK` dans `components/CourseView.js` remplace `fetch` par une version qui sert `verse1.txt`, `verse2.txt`, `products.json` et répond 404 pour le reste, avec de vraies `Response`. Le lanceur HTML sait aussi exécuter des étapes `pre` (clics, frappes simulés) avant de vérifier la page.
+
 ## Ajouter du contenu
 Cours > leçons > tests dans `lib/data.js`. Le contenu pédagogique de chaque leçon (explication, exemple, étapes, piège) est dans `lib/guide/*.js` (un fichier par cours, une entrée par `id` de leçon, FR + EN) ; la présentation de chaque cours est dans `INTRO` de `lib/guide.js`. Les leçons ajoutées (avec des liens vers les documentations officielles, sans en reprendre tout le contenu) sont dans `lib/lessons-docs.js` (exercices et solutions) et `lib/guide/docs.js` (explications) ; les liens vers les pages officielles sont dans `lib/guide/links.js`. Les textes de l'interface ajoutés au redesign sont dans `lib/ux.js`. Questions d'examen : `EXAMS` dans `lib/data.js` **et** réponses (index) dans `server/answers.js`.
 Nom du site : `SITE_NAME` dans `lib/data.js` et titre dans `app/layout.js`.
