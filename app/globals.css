@@ -343,3 +343,58 @@ kbd{font:500 .68rem var(--mono);border:1px solid var(--hair);border-bottom-width
 .u{text-decoration:underline;text-underline-offset:3px}.u:hover{color:var(--signal)}
 @media(max-width:1100px){.based{grid-template-columns:repeat(3,1fr)}.based a{border-bottom:1px solid var(--line)}}
 .nodenote{max-width:68ch;border:1px dashed var(--ink);padding:.7rem 1rem;font-size:.9rem;color:var(--mut);background:var(--paper2)}
+
+/* ===== Mobile : empêche tout débordement horizontal (Android / Samsung) ===== */
+html{overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overflow-x:clip}
+@supports not (overflow:clip){html,body{overflow-x:hidden}}
+img,svg,video,canvas,iframe{max-width:100%}
+/* Les enfants de grilles/flex peuvent rétrécir : sans ça, une ligne de code force la page à s'élargir */
+.hero-grid>*,.lesson>*,.authwrap>*,.intro>*,.cards>*,.mcard>*,.row-c>*,.next>*,.based>*,.vform>*,.sec-h>*,.ed>*,.ed-wrap,.slip,.slip .body{min-width:0}
+.slip pre{min-width:0}
+@media(max-width:900px){
+  .hero-grid,.lesson,.authwrap,.intro,.vform,.sec-h{grid-template-columns:minmax(0,1fr)}
+  .row-c{grid-template-columns:2.2rem 2.6rem minmax(0,1fr) 2rem}
+  .mcard{grid-template-columns:3.5rem minmax(0,1fr)}
+  .next{grid-template-columns:auto minmax(0,1fr)}
+  .based{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero h1{font-size:clamp(2.2rem,10.5vw,6rem)}
+}
+@media(max-width:560px){
+  .based{grid-template-columns:minmax(0,1fr)}
+  .based a,.based a+a{padding:1.1rem 0}
+  .hdr .in{gap:.5rem}
+  .logo{font-size:1.3rem;gap:.45rem}.logo em{font-size:.7rem}.logo .mark{width:26px;height:26px}
+  .tools{gap:.4rem}
+  .find{padding:.42rem .55rem}
+  .theme,.burger{width:2.2rem;height:2.2rem}.burger i:first-child{top:.85rem}.burger i:last-child{top:1.3rem}.burger.x i:first-child,.burger.x i:last-child{top:1.07rem}
+  .who{display:none} /* le compte reste accessible dans le menu */
+  .meta-top{flex-wrap:wrap;gap:.3rem .8rem}
+  .hero .row,.cta .row{flex-wrap:wrap;gap:.7rem}
+  .btn{max-width:100%}
+  .slip{box-shadow:6px 6px 0 var(--signal)}
+  .slip .body{font-size:.74rem}
+  .mcard{position:relative;top:0;min-height:0;padding:1.2rem;gap:1rem}
+  .row-c{padding:1.2rem .2rem}
+  .ft nav{flex-wrap:wrap;gap:.8rem 1.2rem}
+  .sheet a{font-size:clamp(2rem,10vw,3rem)}
+  .page{padding-top:1.6rem}
+}
+/* Gros mot du bas de l'accueil : il doit toujours tenir en entier dans l'écran */
+.cta{container-type:inline-size}
+.cta .big{font-size:clamp(2.6rem,13vw,18rem);max-width:100%;overflow-wrap:normal}
+@supports (font-size:1cqw){.cta .big{font-size:min(14.5cqw,18rem)}}
+.based-line{display:flex;align-items:center;gap:.6rem;max-width:46ch;margin:-.6rem 0 1.6rem;font:600 .86rem/1.4 var(--sans);color:var(--ink)}
+.based-line i{flex:none;width:.6rem;height:.6rem;background:var(--signal)}
+/* Bandeau d'installation (PWA) */
+.pwa{position:fixed;z-index:650;left:max(.8rem,env(safe-area-inset-left));right:max(.8rem,env(safe-area-inset-right));bottom:max(.8rem,env(safe-area-inset-bottom));margin:0 auto;max-width:34rem;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.9rem;align-items:center;padding:.9rem 1rem;background:var(--paper);color:var(--ink);border:1px solid var(--ink);box-shadow:7px 7px 0 var(--signal);animation:pwain .6s var(--ease) both}
+@keyframes pwain{from{opacity:0;transform:translateY(24px)}}
+.pwa img{width:3rem;height:3rem;display:block}
+.pwa b{display:block;font:400 1.15rem/1.1 var(--display);letter-spacing:-.03em}
+.pwa p{margin:.2rem 0 0;font-size:.82rem;line-height:1.4;color:var(--mut)}
+.pwa .acts{display:flex;flex-direction:column;gap:.4rem}
+.pwa button{font:700 .85rem var(--sans);padding:.5rem .9rem;border:1px solid var(--ink);cursor:pointer;background:var(--ink);color:var(--paper)}
+.pwa button.ghost{background:transparent;color:var(--mut);border-color:var(--hair)}
+@media(max-width:480px){.pwa{grid-template-columns:auto minmax(0,1fr);}.pwa .acts{grid-column:1/-1;flex-direction:row}.pwa .acts button{flex:1}}
+@media print{.pwa{display:none!important}}
+.install-link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}

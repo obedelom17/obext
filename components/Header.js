@@ -8,6 +8,7 @@ import Ring from './Ring';
 import { useApp } from './Providers';
 import { SITE_NAME, UI, COURSES } from '../lib/data';
 import { X } from '../lib/ux';
+import { useInstall } from './Install';
 
 export default function Header() {
   const { lang, changeLang, t, user, done } = useApp();
@@ -30,6 +31,7 @@ export default function Header() {
     vt.ready.then(() => document.documentElement.animate({ clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] }, { duration: 700, easing: 'cubic-bezier(.65,0,.2,1)', pseudoElement: '::view-transition-new(root)' }));
   };
   useEffect(() => { const h = () => flip(); addEventListener('ox:toggle-theme', h); return () => removeEventListener('ox:toggle-theme', h); });
+  const { can: canInstall, install } = useInstall();
   const [a, b] = SITE_NAME.split('.');
   const nav = [['/courses/', t(UI.courses), '/courses'], ['/verify/', t(UI.verify), '/verify']];
   return (
@@ -64,6 +66,7 @@ export default function Header() {
       <div className={`sheet${menu ? ' open' : ''}`} aria-hidden={!menu}>
         {[['/', t(X.actHome)], ['/courses/', t(UI.courses)], ['/verify/', t(UI.verify)], ['/account/', user ? user.name.split(' ')[0] : t(UI.login)]].map(([h, l], i) => <Link key={h} href={h} style={{ '--i': i }}>{l}</Link>)}
         <button style={{ '--i': 4 }} onClick={() => { setMenu(false); dispatchEvent(new CustomEvent('ox:palette')); }}>{t(X.search)}</button>
+        {canInstall && <button style={{ '--i': 5 }} onClick={() => { setMenu(false); install(); }}>{t(X.install)}</button>}
       </div>
     </>
   );

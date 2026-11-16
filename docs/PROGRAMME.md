@@ -10,7 +10,7 @@ construire, déployer et maintenir une application ».
 3. Statuts : **✔✔** vérifié sur la documentation · **✔** présent mais écrit de mémoire (à vérifier) · **◐** partiel · **✗** manquant.
 4. Aucune leçon n’est supprimée : elles sont vérifiées, corrigées ou remplacées une par une.
 
-> Pages relues en détail à ce jour : Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » et « Handling conflicts » (2026-11-15). Tout le reste est ✔ (de mémoire) ou ◐/✗.
+> Pages relues en détail à ce jour : Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » « Handling conflicts » et « Web page metadata » (2026-11-15). Tout le reste est ✔ (de mémoire) ou ◐/✗.
 > Exemple d’écart déjà trouvé : `middleware.js` est devenu `proxy.js` dans Next.js 16 (leçon ex-4 corrigée).
 
 ---
@@ -19,7 +19,7 @@ construire, déployer et maintenir une application ».
 | Thème | Statut | Leçons |
 |---|---|---|
 | Premiers pas : balises, éléments, attributs | ✔ | hc-1, hc-2 |
-| Structure d’un document : `<!doctype>`, `<html lang>`, `<head>`, `<meta>`, `<title>` | ✗ | — |
+| Structure d’un document : `<!doctype>`, `<html lang>`, `<head>`, `<meta>` (charset, author, description), `<title>` vs `<h1>`, `<link>`, `<script defer>`, `lang` | ✔✔ (MDN « Web page metadata », relue 2026-11-15) | head-1…head-6 |
 | Sémantique du texte : titres, `em`/`strong`, citations, `code`, abréviations | ◐ | hc-1 |
 | Listes | ✔ | hc-3 |
 | Liens (relatifs, ancres, e-mail) | ◐ | hc-2 |
@@ -120,7 +120,7 @@ construire, déployer et maintenir une application ».
 ---
 
 ## Ordre de reconstruction proposé
-1. **Navigateur** : combler les trous de MDN (document HTML, cascade, texte CSS, **DOM**, **événements**, `fetch`, stockage, accessibilité).
+1. **Navigateur** : combler les trous de MDN (~~document HTML~~, ~~cascade~~, texte CSS, ~~DOM~~, ~~événements~~, ~~`fetch`~~, stockage, accessibilité : les barrés sont faits).
 2. **Node.js** : vérifier les 43 leçons page par page, ajouter `https`, `net`, `zlib`, `pipeline`, débogage, `--watch`.
 3. **React** : suivre l’ordre exact de « Learn React », ajouter le tutoriel Tic-Tac-Toe et « Thinking in React ».
 4. **Next.js** : suivre l’ordre de « Getting Started » (installation, structure, déploiement, CSS) puis un projet complet.

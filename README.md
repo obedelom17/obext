@@ -36,6 +36,11 @@ Les leçons sont réservées aux comptes (écran de connexion dans `components/C
 ## Cours Node.js
 Le cours Node.js (`lib/node-course.js`, explications dans `lib/guide/node.js`) s'exécute dans un Node simulé (`tools/node-shim.src.js`) : fichiers en mémoire, requêtes HTTP de test, aucun réseau réel. Après toute modification de `tools/node-shim.src.js`, relancer `node tools/build-shim.mjs` pour régénérer `lib/node-shim.js`.
 
+## Application installable (PWA)
+- `app/manifest.js` (nom, couleurs, icônes, raccourcis), icônes générées depuis le vrai logo dans `public/icons/`, service worker `public/sw.js`, page `public/offline.html`.
+- `components/Install.js` : enregistre le service worker (en production seulement) et affiche un bandeau « Installer l’application » 4 s après l’arrivée (Chrome, Edge, Android). Sur iPhone, le bandeau explique « Partager → Sur l’écran d’accueil ». Refusé, il ne revient pas avant 14 jours ; un lien « Installer » reste dans le menu mobile et le pied de page.
+- Pour tester : `npm run build`, servir `out/` en HTTPS (ou sur Cloudflare Pages), puis Chrome → DevTools → Application → Manifest.
+
 ## Leçons navigateur (DOM, événements, fetch)
 Elles sont dans `lib/lessons-browser.js` (exercices et solutions) et `lib/guide/browser.js` (explications). Les leçons `net-*` utilisent un **serveur simulé** : `FETCH_MOCK` dans `components/CourseView.js` remplace `fetch` par une version qui sert `verse1.txt`, `verse2.txt`, `products.json` et répond 404 pour le reste, avec de vraies `Response`. Le lanceur HTML sait aussi exécuter des étapes `pre` (clics, frappes simulés) avant de vérifier la page.
 

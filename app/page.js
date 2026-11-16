@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Hero from '../components/Hero';
 import Field from '../components/Field';
 import CourseRow from '../components/CourseRow';
-import CountUp from '../components/CountUp';
 import { useApp } from '../components/Providers';
 import { COURSES, UI } from '../lib/data';
 import { X } from '../lib/ux';
@@ -18,8 +17,8 @@ function Line({ text, d = 0, cls = '' }) {
     <span className={`ln ${cls}`}>
       <span className="chs">
         {text.split(' ').map((w, wi) => (
-          <span key={wi} className="wd">
-            {[...w].map((c) => <span key={k} className="ch" style={{ '--i': k++, '--d': `${d}s` }}>{c}</span>)}
+          <span key={wi}>
+            <span className="wd">{[...w].map((c) => <span key={k} className="ch" style={{ '--i': k++, '--d': `${d}s` }}>{c}</span>)}</span>
             {' '}
           </span>
         ))}
@@ -56,6 +55,7 @@ export default function Home() {
         <div className="hero-grid">
           <div>
             <p className="lead rv" style={{ '--d': '.9s' }}>{t(UI.heroSub2)}</p>
+            <p className="based-line rv" style={{ '--d': '.95s' }}><i aria-hidden="true" />{t(X.basedShort)}</p>
             <div className="row rv" style={{ '--d': '1s' }}>
               <Link className="btn mag" href="/courses/">{t(UI.start)}<span className="ar"><Arrow /></span></Link>
               <Link className="btn ghost mag" href="/verify/">{t(UI.verify)}</Link>
@@ -101,14 +101,6 @@ export default function Home() {
               <Scene k={i} />
             </article>
           ))}
-        </div>
-      </section>
-      <section className="sec">
-        <span className="lbl rv">{t(UI.numsLbl).replace(/^\[\d+\]\s*/, '')}</span>
-        <div className="nums">
-          <div className="rv"><b><CountUp to={COURSES.length} /></b><span>{t(UI.sCourses)}</span></div>
-          <div className="rv" style={{ '--d': '.1s' }}><b><CountUp to={lessons} /></b><span>{t(UI.sLessons)}</span></div>
-          <div className="rv" style={{ '--d': '.2s' }}><b><CountUp to={2} /></b><span>{t(UI.sLangs)}</span></div>
         </div>
       </section>
       <section className="cta">
