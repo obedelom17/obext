@@ -10,9 +10,9 @@ construire, déployer et maintenir une application ».
 3. Statuts : **✔✔** vérifié sur la documentation · **✔** présent mais écrit de mémoire (à vérifier) · **◐** partiel · **✗** manquant.
 4. Aucune leçon n’est supprimée : elles sont vérifiées, corrigées ou remplacées une par une.
 
-> **Règle du projet : toutes les leçons doivent venir uniquement des documentations officielles.** Une leçon n’est marquée « Vérifié » (registre `lib/guide/verified.js`, pastille sur le site) qu’après relecture de sa page officielle. État : 54 leçons vérifiées sur 208.
+> **Règle du projet : toutes les leçons doivent venir uniquement des documentations officielles.** Une leçon n’est marquée « Vérifié » (registre `lib/guide/verified.js`, pastille sur le site) qu’après relecture de sa page officielle. État : 66 leçons vérifiées sur 214.
 >
-> Pages relues en détail à ce jour : Next.js « page.js », « layout.js », « Link Component », « route.js », « Dynamic Segments » et « generateStaticParams » (2026-11-16), Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » « Handling conflicts » et « Web page metadata » (2026-11-16). Tout le reste est ✔ (de mémoire) ou ◐/✗.
+> Pages relues en détail à ce jour : Next.js « page.js », « layout.js », « Link Component », « route.js », « loading.js », « error.js », « not-found.js » et « notFound » et « Image Component », « Dynamic Segments » et « generateStaticParams » (2026-11-16), Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » « Handling conflicts » et « Web page metadata » (2026-11-16). Tout le reste est ✔ (de mémoire) ou ◐/✗.
 > Exemple d’écart déjà trouvé : `middleware.js` est devenu `proxy.js` dans Next.js 16 (leçon ex-4 corrigée).
 
 ---
