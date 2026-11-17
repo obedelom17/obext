@@ -8,7 +8,7 @@ import { COURSES, UI } from '../lib/data';
 import { X } from '../lib/ux';
 import { SOURCES } from '../lib/guide/links';
 
-const WORDS = ['HTML', 'CSS', 'JavaScript', 'React', 'Next.js', 'Algorithmes', 'Hooks', 'Flexbox', 'Server Actions', 'Async'];
+const WORDS = ['HTML', 'CSS', 'JavaScript', 'React', 'Next.js', 'Hooks', 'Flexbox', 'Server Actions', 'Async'];
 
 // Découpe en mots puis en lettres : chaque lettre monte à son tour, une seule fois, au chargement.
 function Line({ text, d = 0, cls = '' }) {
@@ -38,7 +38,8 @@ const Scene = ({ k }) => {
 };
 
 export default function Home() {
-  const { t } = useApp();
+  const { t, done, eng } = useApp();
+  const started = Object.keys(done).length > 0;
   const lessons = COURSES.reduce((a, c) => a + c.lessons.length, 0);
   const band = [...WORDS, ...WORDS].map((w, i) => <span key={i}>{w}<b>✱</b></span>);
   const principles = [['f1t', 'f1d2'], ['f2t', 'f2d2'], ['f3t', 'f3d2'], ['f4t', 'f4d']];
@@ -57,7 +58,7 @@ export default function Home() {
             <p className="lead rv" style={{ '--d': '.9s' }}>{t(UI.heroSub2)}</p>
             <p className="based-line rv" style={{ '--d': '.95s' }}><i aria-hidden="true" />{t(X.basedShort)}</p>
             <div className="row rv" style={{ '--d': '1s' }}>
-              <Link className="btn mag" href="/courses/">{t(UI.start)}<span className="ar"><Arrow /></span></Link>
+              <Link className="btn mag" href="/courses/">{started ? t(X.resumeBtn) : t(UI.start)}<span className="ar"><Arrow /></span></Link>
               <Link className="btn ghost mag" href="/verify/">{t(UI.verify)}</Link>
             </div>
           </div>
@@ -106,7 +107,7 @@ export default function Home() {
       <section className="cta">
         <div className="big rv">{t(UI.ctaBig)}</div>
         <div className="row">
-          <Link className="btn inv mag" href="/courses/">{t(UI.start)}<span className="ar"><Arrow /></span></Link>
+          <Link className="btn inv mag" href="/courses/">{started ? t(X.resumeBtn) : t(UI.start)}<span className="ar"><Arrow /></span></Link>
           <Link className="btn ghost-dark mag" href="/certificate/exemple/">{t(X.seeSample)}</Link>
         </div>
       </section>

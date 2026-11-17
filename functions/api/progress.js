@@ -4,8 +4,8 @@ const IDS = new Set(COURSES.flatMap((c) => c.lessons.map((l) => l.id)));
 export async function onRequestGet({ request, env }) {
   const u = await getUser(request, env);
   if (!u) return json({ error: 'auth' }, 401);
-  const rows = await db(env)`select item from progress where user_id = ${u.id}`;
-  return json({ items: rows.map((r) => r.item) });
+  const rows = await db(env)`select item, done_at from progress where user_id = ${u.id}`;
+  return json({ items: rows.map((r) => r.item), at: rows.map((r) => r.done_at) });
 }
 export async function onRequestPost({ request, env }) {
   const u = await getUser(request, env);

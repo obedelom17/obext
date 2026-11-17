@@ -9,6 +9,7 @@ import { useApp } from './Providers';
 import { SITE_NAME, UI, COURSES } from '../lib/data';
 import { X } from '../lib/ux';
 import { useInstall } from './Install';
+import { Chip } from './Engage';
 
 export default function Header() {
   const { lang, changeLang, t, user, done } = useApp();
@@ -44,6 +45,7 @@ export default function Header() {
           {nav.map(([h, l, p]) => <Link key={h} href={h} className={path.startsWith(p) ? 'on' : ''}>{l}</Link>)}
         </nav>
         <div className="tools">
+        <Chip />
           <button className="find" onClick={() => dispatchEvent(new CustomEvent('ox:palette'))} aria-label={t(X.search)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <span>{t(X.search)}</span><kbd>Ctrl K</kbd>

@@ -10,7 +10,9 @@ construire, déployer et maintenir une application ».
 3. Statuts : **✔✔** vérifié sur la documentation · **✔** présent mais écrit de mémoire (à vérifier) · **◐** partiel · **✗** manquant.
 4. Aucune leçon n’est supprimée : elles sont vérifiées, corrigées ou remplacées une par une.
 
-> Pages relues en détail à ce jour : Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » « Handling conflicts » et « Web page metadata » (2026-11-15). Tout le reste est ✔ (de mémoire) ou ◐/✗.
+> **Règle du projet : toutes les leçons doivent venir uniquement des documentations officielles.** Une leçon n’est marquée « Vérifié » (registre `lib/guide/verified.js`, pastille sur le site) qu’après relecture de sa page officielle. État : 54 leçons vérifiées sur 208.
+>
+> Pages relues en détail à ce jour : Next.js « page.js », « layout.js », « Link Component », « route.js », « Dynamic Segments » et « generateStaticParams » (2026-11-16), Next.js « proxy.js » (2026-09), MDN « DOM scripting introduction », « Introduction to events » et « Event bubbling » et « Making network requests with JavaScript » « Handling conflicts » et « Web page metadata » (2026-11-16). Tout le reste est ✔ (de mémoire) ou ◐/✗.
 > Exemple d’écart déjà trouvé : `middleware.js` est devenu `proxy.js` dans Next.js 16 (leçon ex-4 corrigée).
 
 ---
@@ -19,7 +21,7 @@ construire, déployer et maintenir une application ».
 | Thème | Statut | Leçons |
 |---|---|---|
 | Premiers pas : balises, éléments, attributs | ✔ | hc-1, hc-2 |
-| Structure d’un document : `<!doctype>`, `<html lang>`, `<head>`, `<meta>` (charset, author, description), `<title>` vs `<h1>`, `<link>`, `<script defer>`, `lang` | ✔✔ (MDN « Web page metadata », relue 2026-11-15) | head-1…head-6 |
+| Structure d’un document : `<!doctype>`, `<html lang>`, `<head>`, `<meta>` (charset, author, description), `<title>` vs `<h1>`, `<link>`, `<script defer>`, `lang` | ✔✔ (MDN « Web page metadata », relue 2026-11-16) | head-1…head-6 |
 | Sémantique du texte : titres, `em`/`strong`, citations, `code`, abréviations | ◐ | hc-1 |
 | Listes | ✔ | hc-3 |
 | Liens (relatifs, ancres, e-mail) | ◐ | hc-2 |
@@ -34,7 +36,7 @@ construire, déployer et maintenir une application ».
 | Thème | Statut | Leçons |
 |---|---|---|
 | Syntaxe, sélecteurs (type, classe, id, attribut, combinateurs) | ◐ | hc-4, hc-5 |
-| Cascade, spécificité (calcul 0-0-0), héritage, `inherit`/`initial`/`unset`, `all`, `!important` | ✔✔ (MDN « Handling conflicts », relue 2026-11-15) | casc-1…casc-7 |
+| Cascade, spécificité (calcul 0-0-0), héritage, `inherit`/`initial`/`unset`, `all`, `!important` | ✔✔ (MDN « Handling conflicts », relue 2026-11-16) | casc-1…casc-7 |
 | Modèle de boîte, `box-sizing`, débordement (`overflow`) | ◐ | hc-6 |
 | Valeurs et unités, `calc()`, couleurs | ◐ | hc-22 |
 | Arrière-plans et bordures | ✗ | — |
@@ -55,10 +57,10 @@ construire, déployer et maintenir une application ».
 | Méthodes de tableau (`map`, `filter`, `reduce`, `every`…) | ✔ | js-2, js-3, js-5, js-17 |
 | Closures, classes, modules ES | ◐ | js-7, js-19 |
 | Erreurs (`try/catch`) | ✔ | jb-14 |
-| **Le DOM** : sélectionner, modifier, créer, déplacer, supprimer, styles et classes | ✔✔ (MDN « DOM scripting introduction », relue 2026-11-15) | dom-1…dom-6 |
-| **Événements** : `addEventListener`, objet événement, `preventDefault`, `removeEventListener`, écouteurs multiples | ✔✔ (MDN « Introduction to events », relue 2026-11-15) | ev-1…ev-5 |
-| Propagation : *bubbling*, `stopPropagation`, capture, délégation, `target` / `currentTarget` | ✔✔ (MDN « Event bubbling », relue 2026-11-15) | ev-6…ev-9 |
-| Requêtes réseau : `fetch`, `response.ok`, `text()`, `json()`, erreurs HTTP, `catch` | ✔✔ (MDN « Making network requests with JavaScript », relue 2026-11-15) | net-1…net-4 |
+| **Le DOM** : sélectionner, modifier, créer, déplacer, supprimer, styles et classes | ✔✔ (MDN « DOM scripting introduction », relue 2026-11-16) | dom-1…dom-6 |
+| **Événements** : `addEventListener`, objet événement, `preventDefault`, `removeEventListener`, écouteurs multiples | ✔✔ (MDN « Introduction to events », relue 2026-11-16) | ev-1…ev-5 |
+| Propagation : *bubbling*, `stopPropagation`, capture, délégation, `target` / `currentTarget` | ✔✔ (MDN « Event bubbling », relue 2026-11-16) | ev-6…ev-9 |
+| Requêtes réseau : `fetch`, `response.ok`, `text()`, `json()`, erreurs HTTP, `catch` | ✔✔ (MDN « Making network requests with JavaScript », relue 2026-11-16) | net-1…net-4 |
 | Asynchrone : callbacks, promesses, `async/await` | ◐ | js-8, js-12 |
 | API web : stockage (`localStorage`), vidéo/audio, canvas | ✗ | — |
 | Orienté objet avancé (prototypes) | ✗ | — |

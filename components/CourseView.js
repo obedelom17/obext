@@ -8,6 +8,9 @@ import Ring from './Ring';
 import { X } from '../lib/ux';
 import { GUIDE, INTRO } from '../lib/guide';
 import { SOURCES } from '../lib/guide/links';
+import { VERIFIED } from '../lib/guide/verified';
+import { PathBar } from './Engage';
+import Coach from './Coach';
 import { NODE_SHIM, nodePrepare } from '../lib/node-shim';
 import { highlight } from '../lib/highlight';
 
@@ -35,7 +38,7 @@ function runReact(code, lesson) {
     const src = code.replace(/^\s*import[^\n]*$/gm, '').replace(/export\s+default\s+/, '');
     const tests = lesson.tests.map(({ dom, expect, pre, match }) => ({ dom, expect, pre, match }));
     const html = `<div id="r"></div><script src="${CDN}react/18.3.1/umd/react.production.min.js"></script><script src="${CDN}react-dom/18.3.1/umd/react-dom.production.min.js"></script><script src="${CDN}babel-standalone/7.24.7/babel.min.js"></script><script>
-const {useState,useEffect,useRef,useReducer,useMemo,useCallback,createContext,useContext,useId,memo,Fragment,useLayoutEffect}=React;const Link=({href,children,...r})=>React.createElement('a',{href,...r},children);const Image=(p)=>React.createElement('img',{src:p.src,alt:p.alt});const usePathname=()=>'/courses';const useRouter=()=>({push(){}});const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const {useState,useEffect,useRef,useReducer,useMemo,useCallback,createContext,useContext,useId,memo,Fragment,useLayoutEffect}=React;const Link=({href,children,replace,scroll,prefetch,onNavigate,transitionTypes,...r})=>{const h=href&&typeof href==='object'?(href.pathname||'')+(href.query?'?'+new URLSearchParams(href.query).toString():''):href;const d=(v)=>v===undefined?undefined:String(v);return React.createElement('a',{href:h,'data-replace':d(replace),'data-scroll':d(scroll),'data-prefetch':d(prefetch),...r},children)};const Image=(p)=>React.createElement('img',{src:p.src,alt:p.alt});const usePathname=()=>'/courses';const useRouter=()=>({push(){}});const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{const T=${js(tests)},out=T.map(()=>false);try{
 const C=(0,eval)(Babel.transform(${js(src)}+'\\n;${lesson.component}',{presets:['react']}).code);
 ReactDOM.createRoot(document.getElementById('r')).render(React.createElement(C,${js(lesson.props || {})}));await sleep(80);
@@ -129,12 +132,21 @@ export default function CourseView({ slug }) {
     const r = lesson.html ? await runHTML(code, lesson) : lesson.react ? await runReact(code, lesson) : await runJS(code, lesson.tests, lesson);
     setRes(r); setBusy(false);
     if (r.every(Boolean)) {
-      markDone(lesson.id);
+      markDone(lesson.id, { firstTry: !(tries[lesson.id] > 0) });
       const b = checkRef.current && checkRef.current.getBoundingClientRect();
       dispatchEvent(new CustomEvent('ox:burst', { detail: { x: b ? b.left + b.width / 2 : innerWidth / 2, y: b ? b.top : innerHeight / 2, power: 1 } }));
     }
     else setTries((x) => ({ ...x, [lesson.id]: (x[lesson.id] || 0) + 1 }));
   }
+  useEffect(() => {
+    const go = (e) => {
+      if (e.key !== 'Enter' || e.ctrlKey || e.metaKey || e.altKey || exam || !passed) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (/^(TEXTAREA|INPUT|SELECT|BUTTON|A)$/.test(tag)) return;
+      if (i < course.lessons.length - 1) { e.preventDefault(); setI(i + 1); }
+    };
+    addEventListener('keydown', go); return () => removeEventListener('keydown', go);
+  }, [passed, i, exam, course]);
   function onKey(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); return; }
     if (e.key !== 'Tab') return;
@@ -209,6 +221,7 @@ export default function CourseView({ slug }) {
         <section key={lesson.id} className="pane">
           <div className="kick">{t(UI.lesson)} {i + 1} / {course.lessons.length}</div>
           <h1>{t(lesson.title)}</h1>
+          <PathBar course={course} />
           {i === 0 && INTRO[slug] && (
             <section className="intro">
               <div><span className="lbl">{t(X.goalH)}</span><p>{t(INTRO[slug].goal)}</p></div>
@@ -221,6 +234,7 @@ export default function CourseView({ slug }) {
               <h2 className="gh"><i>1</i>{t(X.learnH)}</h2>
               <p className="gp"><Rich text={t(G.learn)} /></p>
               <Example code={G.ex} t={t} />
+              {VERIFIED[course.lessons[i].id] && <p className="verified"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true"><path d="m4 12 5 5L20 6" /></svg>{t(X.verified)} <span>{VERIFIED[course.lessons[i].id]}</span></p>}
               {G.doc && <a className="doclink" href={G.doc} target="_blank" rel="noopener noreferrer"><span>{t(X.docH)}</span><b>{(SOURCES[slug] || {}).name}</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg></a>}
               <h2 className="gh"><i>2</i>{t(X.stepsH)}</h2>
               <ol className="gsteps">{t(G.steps).map((x, k) => <li key={k}><Rich text={x} /></li>)}</ol>
@@ -238,7 +252,9 @@ export default function CourseView({ slug }) {
           <div className="row">
             <button ref={checkRef} className={`btn${busy ? ' busy' : ''}`} onClick={run} disabled={busy}>{busy ? t(UI.checking) : t(UI.check)}</button>
             <span className="kh">{t(X.runHint)}</span>
-            {passed && i < course.lessons.length - 1 && <button className="btn alt pop" onClick={() => setI(i + 1)}>{t(UI.next)} →</button>}
+            {passed && (i < course.lessons.length - 1
+              ? <button className="btn alt pop" onClick={() => setI(i + 1)}>{t(UI.next)} <kbd className="kbd">Entrée</kbd> →</button>
+              : exm && !done['exam-' + slug] && <button className="btn pop" onClick={() => setExam(true)}>{t(UI.exam)} →</button>)}
             {passed && i === course.lessons.length - 1 && (exm && lessonsDone ? <button className="btn alt pop" onClick={() => setExam(true)}>{t(UI.exam)} →</button> : ready && <Link className="btn alt pop" href={cert}>{t(UI.getCert)}</Link>)}
           </div>
           <span className="lbl">{t(X.checksH)}</span>
@@ -246,6 +262,7 @@ export default function CourseView({ slug }) {
             {lesson.tests.map((x, k) => <li key={k + ':' + (res ? 'r' : 'i')} style={{ '--i': k }} className={res ? (res[k] ? 'pass' : 'fail') : ''}>{res ? (res[k] ? '✓' : '✗') : '○'} {t(x.label)}</li>)}
           </ul>
           {res && <p className={`msg ${passed ? 'ok win' : 'shake'}`} key={tries[lesson.id] + ':' + nPass}>{passed ? <><svg className="tick" width="22" height="22" viewBox="0 0 52 52" aria-hidden="true"><path d="m12 27 9 9 19-20" /></svg>{t(X.lessonDone)} · {t(UI.allPass)}</> : `${nPass}/${res.length} ${t(X.passedN)} · ${t(UI.somePass)}`}</p>}
+          <Coach lesson={lesson} code={code} failedLabels={res ? lesson.tests.filter((_, k) => !res[k]).map((x) => t(x.label)) : []} passed={!!passed} tried={!!res} />
           {!passed && SOL[lesson.id] && (failed >= 2
             ? <div><button className="btn alt" onClick={() => setShowSol(!showSol)}>{t(UI.sol)}</button>{showSol && <pre className="sol">{SOL[lesson.id]}</pre>}</div>
             : <p className="hint">{t(UI.solHint)}</p>)}

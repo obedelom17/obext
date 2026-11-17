@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import CourseRow from '../../components/CourseRow';
 import Ring from '../../components/Ring';
+import { StatBar, Quests, Trophies, WeekDots, Reminder } from '../../components/Engage';
+import League from '../../components/League';
 import { useApp } from '../../components/Providers';
 import { COURSES, UI, BADGES, isReady } from '../../lib/data';
 import { X } from '../../lib/ux';
@@ -24,6 +26,9 @@ export default function Courses() {
           <div><b>{pct}<small>%</small></b><span>{t(UI.kPct)}</span></div>
         </div>
       </section>
+      <StatBar />
+      <WeekDots />
+      <Quests />
       {next ? (
         <Link href={`/courses/${next.slug}/`} className="next spot mag" style={{ '--c': next.color }} data-cursor={t(UI.resume)}>
           <i className="tile">{next.icon}</i>
@@ -32,6 +37,9 @@ export default function Courses() {
           <svg className="go" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </Link>
       ) : <p className="lead">{t(X.allDone)}</p>}
+      <Trophies />
+      <League />
+      <Reminder />
       <div className="badges">{BADGES.map((b, i) => <span key={b.id} style={{ '--i': i }} className={b.test(done) ? 'badge on' : 'badge'}>{b.icon} {t(b.t)}</span>)}</div>
       <div className="rows">{COURSES.map((c, i) => <CourseRow key={c.slug} c={c} i={i} done={done} />)}</div>
     </main>

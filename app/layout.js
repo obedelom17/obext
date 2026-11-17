@@ -7,6 +7,7 @@ import Fx from '../components/Fx';
 import Confetti from '../components/Confetti';
 import CommandPalette from '../components/CommandPalette';
 import Install from '../components/Install';
+import Gains from '../components/Gains';
 const display = Archivo_Black({ subsets: ['latin'], weight: '400', variable: '--display' });
 const sans = Schibsted_Grotesk({ subsets: ['latin'], variable: '--sans' });
 const mono = Martian_Mono({ subsets: ['latin'], variable: '--mono' });
@@ -28,7 +29,7 @@ export default function RootLayout({ children }) {
     <html lang="fr" data-theme="light" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: init }} /></head>
       <body className={`${display.variable} ${sans.variable} ${mono.variable}`}>
-        <Providers><a className="skip" href="#main">Aller au contenu / Skip to content</a><Fx /><Confetti /><CommandPalette /><Install /><Header /><div className="view" id="main" tabIndex={-1}>{children}</div><Footer /></Providers>
+        <Providers><a className="skip" href="#main">Aller au contenu / Skip to content</a><Fx /><Confetti /><CommandPalette /><Install /><Gains /><Header /><div className="view" id="main" tabIndex={-1}>{children}</div><Footer /></Providers>
       </body>
     </html>
   );

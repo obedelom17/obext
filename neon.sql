@@ -19,3 +19,12 @@ create table if not exists certificates (
   issued_at timestamptz not null default now(),
   unique (user_id, course)
 );
+
+-- ===== Migration : coach IA (Groq) et classement de la semaine =====
+create table if not exists ai_usage (
+  user_id uuid references users(id) on delete cascade,
+  day date not null default current_date,
+  n int not null default 0,
+  primary key (user_id, day)
+);
+alter table users add column if not exists show_rank boolean not null default true;

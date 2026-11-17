@@ -36,6 +36,20 @@ Les leçons sont réservées aux comptes (écran de connexion dans `components/C
 ## Cours Node.js
 Le cours Node.js (`lib/node-course.js`, explications dans `lib/guide/node.js`) s'exécute dans un Node simulé (`tools/node-shim.src.js`) : fichiers en mémoire, requêtes HTTP de test, aucun réseau réel. Après toute modification de `tools/node-shim.src.js`, relancer `node tools/build-shim.mjs` pour régénérer `lib/node-shim.js`.
 
+## Coach IA (Groq) et classement
+1. Exécute le bloc « Migration : coach IA (Groq) et classement de la semaine » de `neon.sql` dans la console Neon (table `ai_usage`, colonne `users.show_rank`).
+2. Dans Cloudflare Pages → Settings → Variables and Secrets, ajoute `GROQ_API_KEY` (type Secret). Optionnel : `AI_DAILY_LIMIT` (20 par défaut) et `GROQ_MODEL` (`llama-3.3-70b-versatile` par défaut).
+3. `functions/api/ai.js` : réservé aux comptes connectés, limité par jour. Il envoie au modèle la leçon (explication, étapes, piège), un extrait de la page officielle et le code de l’apprenant ; jamais la solution. Le prompt interdit de répondre hors de ce contenu et de donner le code final.
+4. `functions/api/league.js` : classement de la semaine (10 XP par leçon depuis lundi), prénoms seulement ; chacun peut se masquer.
+Sans `GROQ_API_KEY`, le coach affiche « pas encore activé » et le reste du site fonctionne.
+
+## Motivation (série, XP, objectif du jour)
+- `lib/engage.js` : XP (10 par leçon, 100 par examen), niveaux (le niveau n demande 25 × (n−1)² XP), série de jours avec « boucliers » (un bouclier gagné tous les 7 jours, 2 au maximum, couvre un jour manqué), objectif du jour (1, 2, 3 ou 5 leçons).
+- `components/Providers.js` enregistre l’activité à chaque leçon validée (localStorage `ox-act`, reconstruite depuis les dates du serveur après connexion) et émet l’événement `ox:gain`.
+- Quêtes du jour (3 par jour, XP bonus), bonus « premier coup », 13 trophées, titres de niveau, sons synthétisés (désactivables) : `lib/engage.js`, `lib/sfx.js`.
+- Tableau de bord : résumé de la semaine (7 points), partage de la série (Web Share), rappel quotidien au choix de l’apprenant (fichier agenda .ics, aucune notification imposée). Dans une leçon : Entrée passe à la leçon suivante, et le dernier bouton mène à l’examen.
+- `components/Gains.js` affiche les récompenses ; `components/Engage.js` contient la pastille de l’en-tête, le bloc du tableau de bord et la barre « plus que N leçons avant l’examen ».
+
 ## Application installable (PWA)
 - `app/manifest.js` (nom, couleurs, icônes, raccourcis), icônes générées depuis le vrai logo dans `public/icons/`, service worker `public/sw.js`, page `public/offline.html`.
 - `components/Install.js` : enregistre le service worker (en production seulement) et affiche un bandeau « Installer l’application » 4 s après l’arrivée (Chrome, Edge, Android). Sur iPhone, le bandeau explique « Partager → Sur l’écran d’accueil ». Refusé, il ne revient pas avant 14 jours ; un lien « Installer » reste dans le menu mobile et le pied de page.
