@@ -14,7 +14,7 @@ import Coach from './Coach';
 import { NODE_SHIM, nodePrepare } from '../lib/node-shim';
 import { highlight } from '../lib/highlight';
 
-const strip = (c) => c.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
+const strip = (c) => c.replace(/\/\*[\s\S]*?\*\/|(?<![:\\])\/\/.*$/gm, '');
 const js = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
 const CDN = 'https://cdnjs.cloudflare.com/ajax/libs/';
 
