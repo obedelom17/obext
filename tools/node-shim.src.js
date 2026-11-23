@@ -64,6 +64,96 @@ function shim() {
     TextEncoder: TextEncoder, TextDecoder: TextDecoder, types: { isPromise: function (x) { return !!x && typeof x.then === 'function'; } }
   };
 
+
+  // ── util.parseArgs (d'après la doc Node.js : options type/short/multiple/default, strict, allowPositionals, tokens)
+  function paErr(code, msg) { var e = new TypeError(msg); e.code = code; return e; }
+  util.parseArgs = function parseArgs(config) {
+    config = config || {};
+    var args = config.args !== undefined ? config.args : proc.argv.slice(2);
+    var strict = config.strict !== undefined ? config.strict : true;
+    var allowPositionals = config.allowPositionals !== undefined ? config.allowPositionals : !strict;
+    var allowNegative = !!config.allowNegative;
+    var options = config.options || {};
+    var hasOwn = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+    var shorts = {};
+    Object.keys(options).forEach(function (name) {
+      var o = options[name];
+      if (o.type !== 'string' && o.type !== 'boolean') throw paErr('ERR_INVALID_ARG_VALUE', "The property 'options." + name + ".type' must be one of: 'string', 'boolean'. Received " + util.inspect(o.type));
+      if (o.short !== undefined) {
+        if (typeof o.short !== 'string' || o.short.length !== 1) throw paErr('ERR_INVALID_ARG_VALUE', "The property 'options." + name + ".short' must be a single character. Received " + util.inspect(o.short));
+        shorts[o.short] = name;
+      }
+      if (o.default !== undefined) {
+        var okType = o.type === 'string' ? 'string' : 'boolean';
+        var vals = o.multiple ? o.default : [o.default];
+        if (o.multiple && !Array.isArray(o.default)) throw paErr('ERR_INVALID_ARG_TYPE', 'The "options.' + name + '.default" property must be an instance of Array.');
+        vals.forEach(function (v) { if (typeof v !== okType) throw paErr('ERR_INVALID_ARG_TYPE', 'The "options.' + name + '.default" property must be of type ' + okType + '.'); });
+      }
+    });
+    function typeOf(name) { return hasOwn(options, name) ? options[name].type : undefined; }
+    var tokens = [];
+    for (var i = 0; i < args.length; i++) {
+      var arg = args[i];
+      if (arg === '--') {
+        tokens.push({ kind: 'option-terminator', index: i });
+        for (var j = i + 1; j < args.length; j++) tokens.push({ kind: 'positional', index: j, value: args[j] });
+        break;
+      }
+      if (arg.length > 2 && arg[0] === '-' && arg[1] === '-') {
+        var eq = arg.indexOf('='), name = eq >= 0 ? arg.slice(2, eq) : arg.slice(2);
+        var tk = { kind: 'option', name: name, rawName: '--' + name, index: i, value: undefined, inlineValue: undefined };
+        if (eq >= 0) { tk.value = arg.slice(eq + 1); tk.inlineValue = true; }
+        else if (typeOf(name) === 'string' && i + 1 < args.length) { tk.value = args[++i]; tk.inlineValue = false; }
+        tokens.push(tk);
+      } else if (arg.length > 1 && arg[0] === '-' && arg[1] !== '-') {
+        for (var k = 1; k < arg.length; k++) {
+          var ch = arg[k], long = hasOwn(shorts, ch) ? shorts[ch] : ch;
+          var t2 = { kind: 'option', name: long, rawName: '-' + ch, index: i, value: undefined, inlineValue: undefined };
+          if (typeOf(long) === 'string') {
+            if (k + 1 < arg.length) { t2.value = arg.slice(k + 1); t2.inlineValue = true; }
+            else if (i + 1 < args.length) { t2.value = args[++i]; t2.inlineValue = false; }
+            tokens.push(t2); break;
+          }
+          tokens.push(t2);
+        }
+      } else {
+        tokens.push({ kind: 'positional', index: i, value: arg });
+      }
+    }
+    var values = Object.create(null), positionals = [];
+    tokens.forEach(function (t) {
+      if (t.kind === 'positional') {
+        if (!allowPositionals) throw paErr('ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL', "Unexpected argument '" + t.value + "'. This command does not take positional arguments");
+        positionals.push(t.value); return;
+      }
+      if (t.kind !== 'option') return;
+      var name = t.name;
+      if (!hasOwn(options, name)) {
+        if (allowNegative && name.indexOf('no-') === 0 && hasOwn(options, name.slice(3)) && options[name.slice(3)].type === 'boolean') { name = name.slice(3); t.name = name; t.value = false; }
+        else if (strict) throw paErr('ERR_PARSE_ARGS_UNKNOWN_OPTION', "Unknown option '" + t.rawName + "'" + (allowPositionals ? ". To specify a positional argument starting with a '-', place it at the end of the command after '--', as in '-- \"" + t.rawName + "\"" : ''));
+      }
+      var type = typeOf(name);
+      if (strict && type) {
+        var sh = options[name].short, both = (sh ? '-' + sh + ', ' : '') + '--' + name;
+        if (type === 'string' && typeof t.value !== 'string') throw paErr('ERR_PARSE_ARGS_INVALID_OPTION_VALUE', "Option '" + both + " <value>' argument missing");
+        if (type === 'string' && t.inlineValue === false && t.value.length > 1 && t.value[0] === '-') {
+          var raw = t.rawName, isShort = raw[1] !== '-';
+          throw paErr('ERR_PARSE_ARGS_INVALID_OPTION_VALUE', "Option '" + raw + "' argument is ambiguous.\nDid you forget to specify the option argument for '" + raw + "'?\nTo specify an option argument starting with a dash use " + (isShort ? "'--" + name + "=-XYZ' or '" + raw + "-XYZ'." : "'" + raw + "=-XYZ'."));
+        }
+        if (type === 'boolean' && t.value !== undefined && t.value !== false) throw paErr('ERR_PARSE_ARGS_INVALID_OPTION_VALUE', "Option '" + both + "' does not take an argument");
+      }
+      var v = t.value === undefined ? true : t.value;
+      if (type && options[name].multiple) { (values[name] = values[name] || []).push(v); }
+      else values[name] = v;
+    });
+    Object.keys(options).forEach(function (name) {
+      if (options[name].default !== undefined && values[name] === undefined) values[name] = options[name].default;
+    });
+    var out = { values: values, positionals: positionals };
+    if (config.tokens) out.tokens = tokens;
+    return out;
+  };
+
   // ── assert
   function AssertionError(o) { var e = new Error(o.message); e.name = 'AssertionError'; e.code = 'ERR_ASSERTION'; e.actual = o.actual; e.expected = o.expected; e.operator = o.operator; e.generatedMessage = !o.userMsg; return e; }
   function deepEq(a, b, strict) {
@@ -185,6 +275,70 @@ function shim() {
   Transform.prototype.end = function (c) { if (c !== undefined) this.write(c); this.emit('end'); this.emit('finish'); };
   var stream = { Readable: Readable, Transform: Transform, PassThrough: function () { return new Transform(); }, Writable: Transform };
 
+
+  // ── stream/promises (version simplifiée : étapes = flux Transform du simulateur, générateurs asynchrones ou itérables)
+  function toAsyncIter(x) {
+    if (x && typeof x[Symbol.asyncIterator] === 'function') return x;
+    if (x && typeof x[Symbol.iterator] === 'function') return (async function* () { for (var c of x) yield c; })();
+    var e = new TypeError('The "source" argument must be an iterable or async iterable'); e.code = 'ERR_INVALID_ARG_TYPE'; throw e;
+  }
+  var streamP = {
+    pipeline: async function pipeline() {
+      var a = Array.prototype.slice.call(arguments), last = a[a.length - 1];
+      if (last && typeof last === 'object' && typeof last.write !== 'function' && !last[Symbol.asyncIterator] && !last[Symbol.iterator]) a.pop();
+      if (a.length < 2) { var m = new TypeError('The "streams" argument must be specified'); m.code = 'ERR_MISSING_ARGS'; throw m; }
+      var cur = typeof a[0] === 'function' ? a[0]() : a[0];
+      for (var i = 1; i < a.length; i++) {
+        var step = a[i], isLast = i === a.length - 1;
+        if (typeof step === 'function') {
+          var r = step(toAsyncIter(cur));
+          if (isLast) return await r;
+          cur = r;
+        } else if (step && typeof step.write === 'function') {
+          if (isLast) {
+            var err = null; step.on('error', function (e) { err = e; });
+            for await (var c of toAsyncIter(cur)) { step.write(c); if (err) throw err; }
+            step.end(); if (err) throw err; return;
+          }
+          cur = (function (src, t) {
+            return (async function* () {
+              var out = [], err = null; t.on('data', function (d) { out.push(d); }); t.on('error', function (e) { err = e; });
+              for await (var ch of toAsyncIter(src)) { t.write(ch); await Promise.resolve(); if (err) throw err; while (out.length) yield out.shift(); }
+              t.end(); if (err) throw err; while (out.length) yield out.shift();
+            })();
+          })(cur, step);
+        } else { var e2 = new TypeError('Invalid pipeline stage'); e2.code = 'ERR_INVALID_ARG_TYPE'; throw e2; }
+      }
+    },
+    finished: function finished(s) { return new Promise(function (res, rej) { s.once('end', res); s.once('finish', res); s.once('error', rej); }); }
+  };
+  stream.promises = streamP;
+
+  // ── zlib (versions asynchrones à callback, via CompressionStream / DecompressionStream du navigateur)
+  function zRun(Ctor, fmt) {
+    return function (data, opts, cb) {
+      if (typeof opts === 'function') { cb = opts; opts = {}; }
+      var run = (async function () {
+        var input = typeof data === 'string' ? enc.encode(data) : bytesOf(data);
+        var cs = new Ctor(fmt), w = cs.writable.getWriter();
+        w.write(input); w.close();
+        var rd = cs.readable.getReader(), parts = [], total = 0;
+        for (;;) { var x = await rd.read(); if (x.done) break; parts.push(x.value); total += x.value.length; }
+        var all = new Uint8Array(total), off = 0; parts.forEach(function (p) { all.set(p, off); off += p.length; });
+        return mk(all);
+      })();
+      if (typeof cb !== 'function') { var e = new TypeError('The "callback" argument must be of type function.'); e.code = 'ERR_INVALID_ARG_TYPE'; throw e; }
+      run.then(function (r) { cb(null, r); }, function (e) { cb(e); });
+    };
+  }
+  function zSyncNo(name) { return function () { var e = new Error('zlib.' + name + ' : les versions synchrones ne sont pas disponibles dans ce simulateur. Utilise la version asynchrone (avec callback ou util.promisify).'); e.code = 'ERR_NOT_AVAILABLE'; throw e; }; }
+  var zlib = {
+    gzip: zRun(g.CompressionStream, 'gzip'), gunzip: zRun(g.DecompressionStream, 'gzip'),
+    deflate: zRun(g.CompressionStream, 'deflate'), inflate: zRun(g.DecompressionStream, 'deflate'),
+    deflateRaw: zRun(g.CompressionStream, 'deflate-raw'), inflateRaw: zRun(g.DecompressionStream, 'deflate-raw')
+  };
+  ['gzipSync', 'gunzipSync', 'deflateSync', 'inflateSync', 'deflateRawSync', 'inflateRawSync'].forEach(function (n) { zlib[n] = zSyncNo(n); });
+
   // ── timers, os, url, http…
   g.setImmediate = g.setImmediate || function (f) { var a = Array.prototype.slice.call(arguments, 1); return setTimeout(function () { f.apply(null, a); }, 0); };
   var timersP = { setTimeout: function (ms, v) { return new Promise(function (r) { setTimeout(function () { r(v); }, ms); }); }, setImmediate: function (v) { return Promise.resolve(v); } };
@@ -220,6 +374,6 @@ function shim() {
   g.module = { exports: {} }; g.exports = g.module.exports; g.__filename = '/app/index.js'; g.__dirname = '/app';
   var noop = function () {};
   var mods = { events: events, path: path, util: util, assert: assert, 'assert/strict': assert, fs: fs, 'fs/promises': fs.promises, buffer: { Buffer: Buffer }, crypto: crypto, stream: stream, timers: { setTimeout: g.setTimeout, setInterval: g.setInterval, setImmediate: g.setImmediate }, 'timers/promises': timersP, os: os, http: http, https: http, url: { URL: URL, URLSearchParams: URLSearchParams }, process: proc,
-    child_process: { exec: noop, execFile: noop, spawn: noop, fork: noop }, worker_threads: { isMainThread: true, parentPort: null, workerData: null, Worker: noop }, cluster: { isPrimary: true, fork: noop }, readline: { createInterface: function () { return new EventEmitter(); } }, test: noop, zlib: {} };
+    child_process: { exec: noop, execFile: noop, spawn: noop, fork: noop }, worker_threads: { isMainThread: true, parentPort: null, workerData: null, Worker: noop }, cluster: { isPrimary: true, fork: noop }, readline: { createInterface: function () { return new EventEmitter(); } }, test: noop, zlib: zlib, 'stream/promises': streamP };
   g.require = function (n) { n = String(n).replace(/^node:/, ''); if (n in mods) return mods[n]; var e = new Error("Cannot find module '" + n + "'"); e.code = 'MODULE_NOT_FOUND'; throw e; };
 }
