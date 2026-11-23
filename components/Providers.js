@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { COURSES, isReady } from '../lib/data';
 import { play } from '../lib/sfx';
-import { xpOf, levelInfo, streakInfo, dayKey, courseCount, STREAK_MILESTONES, PCT_MILESTONES, XP_LESSON, XP_EXAM, FIRST_TRY_XP, QUESTS, questState, questList, ACH, achCtx, titleOf } from '../lib/engage';
+import { isBonusKey, xpOf, levelInfo, streakInfo, dayKey, courseCount, STREAK_MILESTONES, PCT_MILESTONES, XP_LESSON, XP_EXAM, FIRST_TRY_XP, QUESTS, questState, questList, ACH, achCtx, titleOf } from '../lib/engage';
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
 async function api(path, body) {
@@ -37,7 +37,7 @@ export function Providers({ children }) {
       if (me.ok && me.data.user) {
         setUser(me.data.user);
         const pr = (await api('progress')).data; const items = pr.items || [];
-        if (pr.at) { const byDay = {}; pr.at.forEach((iso) => { const k = dayKey(new Date(iso)); byDay[k] = (byDay[k] || 0) + 1; }); setAct((a) => { const m = { ...a }; for (const k in byDay) m[k] = Math.max(m[k] || 0, byDay[k]); try { localStorage.setItem('ox-act', JSON.stringify(m)); } catch {} return m; }); }
+        if (pr.at) { const byDay = {}; pr.at.forEach((iso, ix) => { if (isBonusKey(items[ix] || '')) return; const k = dayKey(new Date(iso)); byDay[k] = (byDay[k] || 0) + 1; }); setAct((a) => { const m = { ...a }; for (const k in byDay) m[k] = Math.max(m[k] || 0, byDay[k]); try { localStorage.setItem('ox-act', JSON.stringify(m)); } catch {} return m; }); }
         const merged = { ...local };
         items.forEach((i) => { merged[i] = true; });
         setDone(merged);
@@ -50,6 +50,12 @@ export function Providers({ children }) {
   }, []);
   const changeLang = (l) => { setLang(l); document.documentElement.lang = l; try { localStorage.setItem('ox-lang', l); } catch {} };
   const setGoal = (g) => { setGoalState(g); try { localStorage.setItem('ox-goal', String(g)); } catch {} };
+  const addBonus = useCallback((n) => { const v = bonusRef.current + n; bonusRef.current = v; setBonus(v); try { localStorage.setItem('ox-bonus', String(v)); } catch {} }, []);
+  useEffect(() => { try { const a = localStorage.getItem('ox-accent'); if (a && /^#[0-9a-fA-F]{6}$/.test(a)) document.documentElement.style.setProperty('--signal', a); } catch {} }, []);
+  const claim = useCallback((id) => {
+    setDone((d) => { const n = { ...d, [id]: true }; try { localStorage.setItem('ox-done', JSON.stringify(n)); } catch {} return n; });
+    if (user) api('progress', { items: [id] });
+  }, [user]);
   const useCoach = useCallback(() => { setCoachFlag(true); try { localStorage.setItem('ox-coach', '1'); } catch {} }, []);
   const markDone = useCallback((id, meta = {}) => {
     const was = !!doneRef.current[id];
@@ -95,5 +101,5 @@ export function Providers({ children }) {
   };
   const t = (v) => (typeof v === 'string' ? v : v[lang]);
   const eng = useMemo(() => { const xp = levelInfo(xpOf(done) + bonus), st = streakInfo(act); return { xp, title: titleOf(xp.level), streak: st, today: act[dayKey()] || 0, goal, quests: questList(questState(quest)), unlocked, firsts, bonus }; }, [done, act, goal, bonus, quest, unlocked, firsts]);
-  return <Ctx.Provider value={{ lang, changeLang, t, done, markDone, user, ready, api, logout, eng, act, setGoal, useCoach, coach }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ lang, changeLang, t, done, markDone, user, ready, api, logout, eng, act, setGoal, useCoach, coach, addBonus, claim }}>{children}</Ctx.Provider>;
 }

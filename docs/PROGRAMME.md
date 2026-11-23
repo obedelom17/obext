@@ -128,3 +128,10 @@ construire, déployer et maintenir une application ».
 3. **React** : suivre l’ordre exact de « Learn React », ajouter le tutoriel Tic-Tac-Toe et « Thinking in React ».
 4. **Next.js** : suivre l’ordre de « Getting Started » (installation, structure, déploiement, CSS) puis un projet complet.
 5. **Projets de fin de parcours** (une application complète déployée) et pages de référence.
+
+## Engagement (ajouté)
+- Coffre du jour (récompense surprise de 20 à 100 XP, fixée par la date), défi de la semaine (10 leçons = 100 XP), carte d'activité sur 16 semaines, couleurs d'accent débloquées par niveau, phrase « presque arrivé » (niveau ou cours), 7 trophées de plus.
+- Code : components/Rewards.js, lib/engage.js (chestReward, weekCount, ACCENTS), Providers.addBonus. Le coffre et le défi sont enregistrés dans la table `progress` (clés `chest-AAAA-MM-JJ` et `week-AAAA-MM-JJ`), donc synchronisés entre appareils ; ils ne comptent pas dans le classement. Les XP des quêtes et du « premier coup » restent locaux.
+
+## Leçons ajoutées le 2026-11-23 (281 au total)
+- js-30 `??` (MDN Nullish coalescing), js-31 `Array.at` (MDN), js-32 `structuredClone` (MDN). Solutions exécutées dans Node : tous les tests passent. Code : lib/lessons-jsmore.js, lib/guide/jsmore.js.

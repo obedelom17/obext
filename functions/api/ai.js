@@ -34,8 +34,11 @@ export async function onRequestPost({ request, env }) {
   if (mode === 'ask' && !clip(question, 500).trim()) return json({ error: 'bad' }, 400);
 
   const limit = +env.AI_DAILY_LIMIT || 20;
-  const [row] = await db(env)`insert into ai_usage (user_id, day, n) values (${u.id}, current_date, 1)
-    on conflict (user_id, day) do update set n = ai_usage.n + 1 returning n`;
+  let row;
+  try {
+    [row] = await db(env)`insert into ai_usage (user_id, day, n) values (${u.id}, current_date, 1)
+      on conflict (user_id, day) do update set n = ai_usage.n + 1 returning n`;
+  } catch { return json({ error: 'db' }, 503); } // table ai_usage absente : bloc « Migration » de neon.sql non exécuté
   if (row.n > limit) return json({ error: 'limit', limit }, 429);
 
   const L = lang === 'en' ? 'en' : 'fr';
@@ -85,7 +88,7 @@ STRICT RULES:
       body: JSON.stringify({ model: env.GROQ_MODEL || 'llama-3.3-70b-versatile', temperature: 0.2, max_tokens: 450, messages: [{ role: 'system', content: rules }, { role: 'user', content: user }] }),
       signal: AbortSignal.timeout(20000),
     });
-    if (!r.ok) return json({ error: 'upstream', status: r.status }, 502);
+    if (!r.ok) { const detail = (await r.text().catch(() => '')).slice(0, 200); return json({ error: 'upstream', status: r.status, detail }, 502); }
     const d = await r.json();
     const answer = d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content;
     if (!answer) return json({ error: 'empty' }, 502);
