@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useApp } from '../../components/Providers';
+import GoogleButton from '../../components/GoogleButton';
 import { UI } from '../../lib/data';
 import { X } from '../../lib/ux';
 export default function Account() {
@@ -33,6 +34,7 @@ export default function Account() {
     <main className="page authwrap">
       <div className="auth-side"><h1 className="rvl"><span className="ln"><span>{t(mode === 'login' ? UI.login : UI.register)}</span></span></h1><p className="lead">{t(X.accPitch)}</p></div>
       <form className="auth" onSubmit={submit} key={mode}>
+        <GoogleButton />
         {mode === 'register' && fld('name', t(UI.fullName))}
         {fld('email', t(UI.email), 'email')}
         {fld('password', t(UI.password), 'password', { minLength: 8 })}

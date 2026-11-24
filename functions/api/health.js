@@ -1,7 +1,7 @@
 import { db, json } from '../../server/lib.js';
 // GET /api/health : vérifie la connexion Neon, les tables et le secret JWT (sans rien divulguer).
 export async function onRequestGet({ env }) {
-  const out = { jwtSecret: !!env.JWT_SECRET, databaseUrl: !!env.DATABASE_URL, database: false, tables: false, groqKey: !!env.GROQ_API_KEY, aiTable: false };
+  const out = { jwtSecret: !!env.JWT_SECRET, databaseUrl: !!env.DATABASE_URL, database: false, tables: false, groqKey: !!env.GROQ_API_KEY, googleClientId: !!env.GOOGLE_CLIENT_ID, googleColumn: false, aiTable: false };
   try {
     const sql = db(env);
     await sql`select 1`;
@@ -10,6 +10,8 @@ export async function onRequestGet({ env }) {
     out.tables = r.n === 3;
     const [a] = await sql`select count(*)::int as n from information_schema.tables where table_name = 'ai_usage'`;
     out.aiTable = a.n === 1;
+    const [g] = await sql`select count(*)::int as n from information_schema.columns where table_name = 'users' and column_name = 'google_sub'`;
+    out.googleColumn = g.n === 1;
   } catch (e) { out.hint = 'Connexion impossible : vérifie DATABASE_URL (chaîne Neon complète, avec ?sslmode=require).'; }
   return json(out, out.jwtSecret && out.database && out.tables ? 200 : 503);
 }

@@ -73,3 +73,12 @@ Après déploiement, ouvre `https://TON-SITE.pages.dev/api/health` :
 Direction éditoriale « suisse » : grille visible, très grosses lettres, un seul accent (`--signal`), curseur-caret personnalisé, bascule clair/sombre en révélation circulaire (View Transitions API), barre de progression de scroll en CSS pur. Les couleurs et la grille sont dans les variables en haut de `app/globals.css`.
 Polices (Google Fonts via `next/font`) : Archivo Black (titres), Schibsted Grotesk (texte), Martian Mono (code et étiquettes). Si ton Next.js refuse un nom de police au build, remplace-le dans `app/layout.js`.
 Logo : `components/Logo.js` (un « o » et un curseur de saisie) et `app/icon.svg`.
+
+## Connexion avec Google
+1. Google Cloud Console → APIs et services → Identifiants → Créer un ID client OAuth, type « Application Web ».
+2. Origines JavaScript autorisées : l'adresse du site (`https://ton-site.pages.dev`, ton domaine, et `http://localhost:8788` pour les tests). Aucune URI de redirection n'est nécessaire (Google Identity Services).
+3. Dans Cloudflare Pages, ajoute la variable `GOOGLE_CLIENT_ID` (l'identifiant client, il est public) puis redéploie.
+4. Exécute le bloc « Migration Google » de `neon.sql` (colonne `users.google_sub`, mot de passe facultatif).
+5. Vérifie `/api/health` : `googleClientId` et `googleColumn` doivent valoir `true`. Le bouton « Continuer avec Google » n'apparaît que si `GOOGLE_CLIENT_ID` est défini.
+- `functions/api/google.js` vérifie le jeton (signature RS256, émetteur, `aud`, expiration, e-mail vérifié) puis crée le compte ou rattache Google au compte du même e-mail.
+- Limite connue : l'e-mail des comptes créés avec un mot de passe n'est pas vérifié ; une personne mal intentionnée pourrait créer un compte avec l'adresse d'autrui avant elle. Une vérification d'e-mail à l'inscription règle ce point.

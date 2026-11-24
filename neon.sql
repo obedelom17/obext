@@ -28,3 +28,7 @@ create table if not exists ai_usage (
   primary key (user_id, day)
 );
 alter table users add column if not exists show_rank boolean not null default true;
+
+-- ===== Migration Google : connexion avec un compte Google =====
+alter table users alter column pass_hash drop not null;
+alter table users add column if not exists google_sub text unique;

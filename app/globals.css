@@ -476,3 +476,9 @@ img,svg,video,canvas,iframe{max-width:100%}
 .nudge{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:1rem var(--pad);padding:.8rem 1.1rem;border:1px dashed var(--signal);color:var(--ink);text-decoration:none}
 .nudge b{color:var(--signal);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.reward.ready{animation:none}}
+
+/* Connexion avec Google */
+.gsi{display:grid;gap:.8rem;justify-items:center;margin-bottom:.4rem}
+.gsi[hidden]{display:none}
+.gsi-or{display:flex;align-items:center;gap:.8rem;width:100%;margin:0;color:var(--mut)}
+.gsi-or::before,.gsi-or::after{content:"";flex:1;height:1px;background:var(--hair)}
