@@ -83,7 +83,7 @@ export function Themes() {
   return (
     <section className="reward themes" aria-label={t(T.themeH)}>
       <h2 className="lbl">{t(T.themeH)}</h2>
-      <div className="sw">{ACCENTS.map((a) => { const ok = eng.xp.level >= a.lvl; return (
+      <div className="accents">{ACCENTS.map((a) => { const ok = eng.xp.level >= a.lvl; return (
         <button key={a.id} disabled={!ok} aria-pressed={cur === a.id} className={cur === a.id ? 'on' : ''} onClick={() => pick(a)} title={ok ? t(a) : t(T.themeLock(a.lvl))}>
           <i style={{ background: a.hex || 'var(--signal)' }} /><span>{ok ? t(a) : t(T.themeLock(a.lvl))}</span>
         </button>); })}</div>
